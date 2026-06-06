@@ -4,8 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.v1.router import api_router
-from app.core.config import settings
+from app.Api.v1.router import api_router
+from app.Core.Config import settings
 from app.db.session import engine
 
 

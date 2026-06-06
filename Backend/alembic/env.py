@@ -6,8 +6,11 @@ from sqlalchemy import pool
 from alembic import context
 
 # Importar la configuracion de la app y los modelos
-from app.core.config import settings
+from app.Core.Config import settings
 from app.db.base import Base
+
+# Importar los modelos para que Base.metadata los detecte
+from app.Models.UserEntity import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,0 +1,67 @@
+# app/Services/AuthService.py
+
+from sqlalchemy.orm import Session
+
+from app.Core.Security import verify_password, create_access_token, hash_password
+from app.Repositories.UserRepository import (
+    get_user_by_email,
+    create_user,
+    get_user_by_email_or_phone,
+)
+from app.Models.UserEntity import User
+from app.Core.Enum import UserRole
+from app.Core.Exceptions import UserAlreadyExistsError, InvalidCredentialsError
+from app.Schemas.AuthSchema import LoginRequest, ClientRegister
+
+
+def authenticate_user(db: Session, correo: str, password: str) -> User | None:
+    """Verifica las credenciales del usuario y retorna el usuario si son correctas."""
+    user = get_user_by_email(db, correo)
+
+    if not user:
+        return None
+
+    if not verify_password(password, user.password_hash):
+        return None
+
+    return user
+
+
+def login_user(db: Session, data: LoginRequest):
+    """Autentica al usuario y retorna el token de acceso."""
+    user = authenticate_user(db, data.correo, data.password)
+
+    if not user:
+        raise InvalidCredentialsError("Correo o contraseña incorrectos")
+
+    access_token = create_access_token(
+        subject=user.id_usuario,
+        extra_data={"role": user.rol.value},
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
+
+
+def register_client(db: Session, data: ClientRegister):
+    """Registra un nuevo usuario con rol cliente."""
+    existing_user = get_user_by_email_or_phone(db, data.correo, data.telefono)
+
+    if existing_user:
+        if existing_user.correo == data.correo:
+            raise UserAlreadyExistsError("El correo ya está registrado")
+        if existing_user.telefono == data.telefono:
+            raise UserAlreadyExistsError("El teléfono ya está registrado")
+
+    user = User(
+        nombre=data.nombre,
+        apellido=data.apellido,
+        telefono=data.telefono,
+        correo=data.correo,
+        password_hash=hash_password(data.password),
+        rol=UserRole.client,
+    )
+
+    return create_user(db, user)
