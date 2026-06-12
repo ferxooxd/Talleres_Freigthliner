@@ -1,5 +1,6 @@
 # app/Schemas/UserSchema.py
 
+from pydantic.fields import Field
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict
 from app.Core.Enum import UserRole
@@ -8,7 +9,8 @@ from app.Core.Enum import UserRole
 class MechanicRegister(BaseModel):
     nombre: str
     apellido: str
-    telefono: str | None = None
+    telefono: str = Field(min_length=10, max_length=10)
+    cedula: str
     correo: EmailStr
     password: str
     rol: UserRole = UserRole.client
@@ -19,7 +21,8 @@ class UserResponse(BaseModel):
     id_usuario: int
     nombre: str
     apellido: str
-    telefono: str | None
+    telefono: str
+    cedula: str
     correo: EmailStr
     fecha_registro: datetime
     rol: UserRole

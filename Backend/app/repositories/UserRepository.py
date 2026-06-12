@@ -8,10 +8,12 @@ def get_user_by_email(db: Session, correo: str) -> User | None:
 
 from sqlalchemy import or_
 
-def get_user_by_email_or_phone(db: Session, correo: str, telefono: str | None) -> User | None:
+def get_user_by_unique_fields(db: Session, correo: str, telefono: str | None, cedula: str | None = None) -> User | None:
     filters = [User.correo == correo]
     if telefono:
         filters.append(User.telefono == telefono)
+    if cedula is not None:
+        filters.append(User.cedula == cedula)
     return db.query(User).filter(or_(*filters)).first()
 
 

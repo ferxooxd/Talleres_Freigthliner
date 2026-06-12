@@ -6,7 +6,7 @@ from app.Core.security import verify_password, create_access_token, hash_passwor
 from app.Repositories.UserRepository import (
     get_user_by_email,
     create_user,
-    get_user_by_email_or_phone,
+    get_user_by_unique_fields,
 )
 from app.Models.UserEntity import User
 from app.Core.Enum import UserRole
@@ -47,18 +47,21 @@ def login_user(db: Session, data: LoginRequest):
 
 def register_client(db: Session, data: ClientRegister):
     """Registra un nuevo usuario con rol cliente."""
-    existing_user = get_user_by_email_or_phone(db, data.correo, data.telefono)
+    existing_user = get_user_by_unique_fields(db, data.correo, data.telefono, data.cedula)
 
     if existing_user:
         if existing_user.correo == data.correo:
             raise UserAlreadyExistsError("El correo ya está registrado")
         if existing_user.telefono == data.telefono:
             raise UserAlreadyExistsError("El teléfono ya está registrado")
+        if getattr(existing_user, "cedula", None) == data.cedula:
+            raise UserAlreadyExistsError("La cédula ya está registrada")
 
     user = User(
         nombre=data.nombre,
         apellido=data.apellido,
         telefono=data.telefono,
+        cedula=data.cedula,
         correo=data.correo,
         password_hash=hash_password(data.password),
         rol=UserRole.client,

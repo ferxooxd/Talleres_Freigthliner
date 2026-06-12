@@ -10,6 +10,7 @@ from app.Services.AuthService import register_client, login_user
 
 
 from app.Core.Exceptions import UserAlreadyExistsError, InvalidCredentialsError
+from sqlalchemy.exc import IntegrityError
 
 
 router = APIRouter()
@@ -27,6 +28,11 @@ def register(data: ClientRegister, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
+        )
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo, teléfono o cédula ya están registrados",
         )
 
 
