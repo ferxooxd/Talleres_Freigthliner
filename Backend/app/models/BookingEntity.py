@@ -16,7 +16,7 @@ class Booking(Base):
     
     # Llaves foráneas (id_usuario queda como Integer por ahora)
     id_usuario = Column(Integer, nullable=False) 
-    id_vehiculo = Column(Integer, ForeignKey("vehicles.id_vehiculo"), nullable=False)
+    id_vehiculo = Column(Integer, ForeignKey("vehiculos.id_vehiculo"), nullable=False)
 
     # Campos del diagrama
     fecha_solicitud = Column(Date, nullable=False)
