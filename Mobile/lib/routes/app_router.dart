@@ -38,6 +38,10 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         path: '/client/dashboard',
         builder: (context, state) => const ClientDashboardScreen(),
       ),
+      GoRoute(
+        path: '/client/agendamientos',
+        builder: (context, state) => const AgendamientoCliente(),
+      ),
     ],
   );
 }
