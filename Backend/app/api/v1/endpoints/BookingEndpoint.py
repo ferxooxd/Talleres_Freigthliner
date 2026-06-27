@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.db.session import get_db  # Dependencia oficial de su proyecto
-from app.schemas.BookingSchema import BookingCreate, BookingResponse
+from app.db.session import get_db
+from app.schemas.BookingSchema import BookingCreate, BookingResponse, BookingUpdate
 from app.services.BookingService import BookingService
 
 
@@ -38,3 +38,24 @@ def list_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     Endpoint para listar todos los agendamientos del sistema.
     """
     return BookingService.get_all_bookings(db=db, skip=skip, limit=limit)
+
+@router.get("/user/{id_usuario}", response_model=List[BookingResponse])
+def list_bookings_by_user(id_usuario: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para listar agendamientos activos de un usuario específico.
+    """
+    return BookingService.get_bookings_by_user(db=db, id_usuario=id_usuario)
+
+@router.put("/{id_agendamiento}", response_model=BookingResponse)
+def update_booking(id_agendamiento: int, booking: BookingUpdate, db: Session = Depends(get_db)):
+    """
+    Endpoint para reprogramar una cita (sujeto a regla de 3 horas).
+    """
+    return BookingService.update_booking(db=db, id_agendamiento=id_agendamiento, booking_data=booking)
+
+@router.delete("/{id_agendamiento}")
+def cancel_booking(id_agendamiento: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para cancelar una cita (sujeto a regla de 3 horas).
+    """
+    return BookingService.cancel_booking(db=db, id_agendamiento=id_agendamiento)

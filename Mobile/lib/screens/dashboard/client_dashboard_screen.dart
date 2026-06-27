@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/dashboard_header.dart';
 import '../client/widgets/agendamiento_cliente.dart';
 import '../client/widgets/comentarios_cliente.dart';
@@ -24,15 +26,17 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       const VehiclesTab(),
       const CommentsTab(),
     ];
+    
+    final initials = context.watch<AuthProvider>().initials;
 
     return Scaffold(
       backgroundColor: const Color(0xFF050607),
       body: SafeArea(
         child: Column(
           children: [
-            const DashboardHeader(
+            DashboardHeader(
               role: 'Cliente',
-              avatarText: 'CM',
+              avatarText: initials,
             ),
             Expanded(
               child: AnimatedSwitcher(
@@ -46,6 +50,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       bottomNavigationBar: _ClientBottomNav(
         currentIndex: _currentIndex,
         onChanged: (index) => setState(() => _currentIndex = index),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Implementación futura del chat con el administrador
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Chat con administrador próximamente...')),
+          );
+        },
+        backgroundColor: AppTheme.green,
+        child: const Icon(Icons.chat_rounded, color: Colors.black),
       ),
     );
   }

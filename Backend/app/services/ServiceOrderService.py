@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.ServiceOrderEntity import ServiceOrder, ServiceOrderState
 from app.models.VehicleEntity import Vehicle
+from app.models.VehicleUserEntity import VehicleUser
 from app.schemas.ServiceOrderSchema import ServiceOrderCreate, ServiceOrderUpdate
 from datetime import datetime
 
@@ -77,3 +78,21 @@ class ServiceOrderService:
             raise HTTPException(status_code=404, detail="Este vehículo no tiene ninguna orden de servicio activa en el taller.")
             
         return active_order
+
+    @staticmethod
+    def get_active_orders_by_user(db: Session, id_usuario: int):
+        """Retorna todas las órdenes de servicio activas de los vehículos asociados a un usuario."""
+        # 1. Encontrar los IDs de los vehículos del usuario
+        vehicle_ids = db.query(VehicleUser.id_vehiculo).filter(VehicleUser.id_usuario == id_usuario).all()
+        vehicle_ids = [vid[0] for vid in vehicle_ids]
+        
+        if not vehicle_ids:
+            return []
+            
+        # 2. Buscar las órdenes activas para esos vehículos
+        active_orders = db.query(ServiceOrder).filter(
+            ServiceOrder.id_vehiculo.in_(vehicle_ids),
+            ServiceOrder.estado_orden != ServiceOrderState.ENTREGADO
+        ).order_by(ServiceOrder.id_orden.desc()).all()
+        
+        return active_orders

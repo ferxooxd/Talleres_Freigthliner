@@ -43,3 +43,11 @@ def get_active_order_by_placa(placa: str, db: Session = Depends(get_db)):
     Retorna la orden de servicio que está actualmente activa en el taller para esa placa.
     """
     return ServiceOrderService.get_active_order_by_placa(db=db, placa=placa)
+
+@router.get("/client/{id_usuario}/active", response_model=List[ServiceOrderResponse])
+def get_active_orders_by_user(id_usuario: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para el Dashboard del Cliente.
+    Retorna todas las órdenes de servicio activas vinculadas a los vehículos de un cliente.
+    """
+    return ServiceOrderService.get_active_orders_by_user(db=db, id_usuario=id_usuario)

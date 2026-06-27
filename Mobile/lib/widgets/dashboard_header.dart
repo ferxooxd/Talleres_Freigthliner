@@ -25,24 +25,6 @@ class DashboardHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppTheme.green,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              'TF',
-              style: GoogleFonts.rajdhani(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +41,7 @@ class DashboardHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'NIT: 900.123.456-7 - Portal Cliente',
+                  'NIT: 7184810 - Portal Cliente',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.dmSans(
@@ -70,8 +52,6 @@ class DashboardHeader extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          _RolePill(role: role),
           const SizedBox(width: 10),
           Stack(
             clipBehavior: Clip.none,
@@ -191,10 +171,48 @@ class _HeaderAvatar extends StatelessWidget {
           if (context.mounted) {
             context.go('/login');
           }
+        } else if (value == 'profile') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Mi Perfil próximamente...')),
+          );
+        } else if (value == 'privacy') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Políticas y Privacidad próximamente...')),
+          );
         }
       },
-      itemBuilder: (context) => const [
-        PopupMenuItem(value: 'logout', child: Text('Cerrar sesion')),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'profile', 
+          child: Row(
+            children: [
+              Icon(Icons.person_outline_rounded, color: AppTheme.text, size: 20),
+              const SizedBox(width: 10),
+              const Text('Mi Cuenta'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'privacy', 
+          child: Row(
+            children: [
+              Icon(Icons.privacy_tip_outlined, color: AppTheme.text, size: 20),
+              const SizedBox(width: 10),
+              const Text('Privacidad'),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'logout', 
+          child: Row(
+            children: [
+              Icon(Icons.logout_rounded, color: AppTheme.red, size: 20),
+              const SizedBox(width: 10),
+              Text('Cerrar sesión', style: GoogleFonts.dmSans(color: AppTheme.red)),
+            ],
+          ),
+        ),
       ],
     );
   }

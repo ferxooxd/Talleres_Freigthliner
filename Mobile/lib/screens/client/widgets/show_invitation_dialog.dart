@@ -48,6 +48,7 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
   void _copiarAlPortapapeles() {
     if (_codigoSecreto != null) {
       Clipboard.setData(ClipboardData(text: _codigoSecreto!)).then((_) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Codigo copiado al portapapeles'),

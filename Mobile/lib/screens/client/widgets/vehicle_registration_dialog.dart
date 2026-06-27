@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../providers/vehicle_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../widgets/ui_components.dart'; // ActionButton, CustomTextField si existen
 
 class VehicleRegistrationDialog extends StatefulWidget {
   const VehicleRegistrationDialog({super.key});
@@ -54,10 +53,39 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: AppTheme.red,
+          var errorMsg = e.toString();
+          // Limpiar todo tipo de prefijo técnico del error
+          errorMsg = errorMsg.replaceAll(RegExp(r'Exception:\s*'), '');
+          errorMsg = errorMsg.replaceAll(RegExp(r'DioException.*detail:\s*'), '');
+          errorMsg = errorMsg.trim();
+          if (errorMsg.isEmpty) errorMsg = 'Este vehículo ya se encuentra registrado en otra cuenta.';
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: const Color(0xFF171717),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.info_outline_rounded, color: AppTheme.amber, size: 28),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Vehículo ya registrado',
+                      style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                errorMsg,
+                style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 15),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text('Entendido', style: GoogleFonts.dmSans(color: AppTheme.green, fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
           );
         }
@@ -122,7 +150,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedTipoVehiculo,
+                initialValue: _selectedTipoVehiculo,
                 style: GoogleFonts.dmSans(color: AppTheme.text),
                 dropdownColor: const Color(0xFF242424),
                 decoration: _inputDecoration('Tipo de Vehiculo'),

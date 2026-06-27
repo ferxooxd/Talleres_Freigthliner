@@ -14,6 +14,11 @@ class BookingBase(BaseModel):
 class BookingCreate(BookingBase):
     pass
 
+class BookingUpdate(BaseModel):
+    fecha_cita: date = Field(..., description="Nueva fecha programada para la cita (YYYY-MM-DD)")
+    hora_cita: time = Field(..., description="Nueva hora programada para la cita (HH:MM:SS)")
+    observaciones: Optional[str] = Field(None, max_length=255, description="Nuevas notas o fallas reportadas")
+
 class BookingResponse(BookingBase):
     id_agendamiento: int
     estado_confirmacion: ConfirmationState

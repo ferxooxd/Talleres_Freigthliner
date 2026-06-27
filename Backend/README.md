@@ -311,7 +311,11 @@ cp .env.example .env
 alembic upgrade head
 
 # 5. Iniciar el servidor de desarrollo
+# Para pruebas solo en el PC local (Emulador):
 uvicorn app.main:app --reload
+
+# Para probar con un dispositivo físico móvil conectado a la misma red Wi-Fi:
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 La documentación interactiva estará disponible en:

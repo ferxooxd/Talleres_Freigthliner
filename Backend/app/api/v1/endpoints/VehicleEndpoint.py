@@ -28,7 +28,7 @@ def register_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db), curr
     if db_vehicle:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Ya existe un vehículo registrado con esta placa."
+            detail="Este vehículo ya se encuentra registrado en otra cuenta. Si eres el conductor, pídele al propietario que te genere un código de invitación."
         )
     
     return VehicleService.create_vehicle(db=db, vehicle_data=vehicle, user_id=current_user.id_usuario)

@@ -5,6 +5,7 @@ import 'routes/app_router.dart';
 import 'providers/auth_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'providers/comment_provider.dart';
+import 'providers/booking_provider.dart';
 
 void main() {
   runApp(
@@ -13,6 +14,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => VehicleProvider()),
         ChangeNotifierProvider(create: (_) => CommentProvider()),
+        ChangeNotifierProvider(create: (_) => BookingProvider()),
       ],
       child: const MyApp(),
     ),

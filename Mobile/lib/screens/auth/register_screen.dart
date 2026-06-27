@@ -165,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 14),
                 CustomTextField(
                   label: 'NIT / Cédula',
-                  hintText: 'Ej. 7184810',
+                  hintText: 'Ej. 123456789',
                   controller: _cedulaController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -174,7 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 14),
                 CustomTextField(
                   label: 'Teléfono',
-                  hintText: 'Ej. 3151234567',
+                  hintText: 'Ej. 3000000000',
                   controller: _telefonoController,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],

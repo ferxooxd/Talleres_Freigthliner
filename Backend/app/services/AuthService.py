@@ -36,7 +36,11 @@ def login_user(db: Session, data: LoginRequest):
 
     access_token = create_access_token(
         subject=user.id_usuario,
-        extra_data={"role": user.rol.value},
+        extra_data={
+            "role": user.rol.value,
+            "nombre": user.nombre,
+            "apellido": user.apellido,
+        },
     )
 
     return {
