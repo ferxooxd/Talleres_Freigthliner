@@ -41,7 +41,7 @@ class DashboardHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'NIT: 7184810 - Portal Cliente',
+                  'NIT: 7184810 - Portal $role',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.dmSans(
@@ -172,9 +172,7 @@ class _HeaderAvatar extends StatelessWidget {
             context.go('/login');
           }
         } else if (value == 'profile') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mi Perfil próximamente...')),
-          );
+          context.push('/profile');
         } else if (value == 'privacy') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Políticas y Privacidad próximamente...')),

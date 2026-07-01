@@ -24,8 +24,14 @@ class AuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get role => _role;
   int? get userId => _userId;
+  String? get userName => _userName;
+  String? get userLastName => _userLastName;
   bool get isAuthenticated => _token != null;
   bool get isClient => _role == 'client' || _role == 'cliente';
+  bool get isMechanic {
+    final r = _role?.trim().toLowerCase();
+    return r == 'mechanic' || r == 'mecanico' || r == 'mecánico' || r == 'tecnico' || r == 'técnico';
+  }
   String get initials {
     if (_userName != null && _userLastName != null && _userName!.isNotEmpty && _userLastName!.isNotEmpty) {
       return '${_userName![0].toUpperCase()}${_userLastName![0].toUpperCase()}';

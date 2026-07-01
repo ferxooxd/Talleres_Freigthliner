@@ -51,13 +51,16 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       if (provider.isClient) {
         context.go('/client/dashboard');
+      } else if (provider.isMechanic) {
+        context.go('/mechanic/dashboard');
       } else {
         await provider.logout();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Este portal solo esta disponible para clientes'),
+          SnackBar(
+            content: Text('Portal inválido. Tu rol es: "${provider.role}". Solo para clientes y mecánicos.'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
