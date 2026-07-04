@@ -6,6 +6,7 @@ class TechnicalReportModel {
   final String diagnostico;
   final String recomendaciones;
   final String? repuestosUsados;
+  final String? imagenesRepuestos;
   final String estadoRevision;
   final String? observacionesAdmin;
 
@@ -17,6 +18,7 @@ class TechnicalReportModel {
     required this.diagnostico,
     required this.recomendaciones,
     this.repuestosUsados,
+    this.imagenesRepuestos,
     required this.estadoRevision,
     this.observacionesAdmin,
   });
@@ -30,6 +32,7 @@ class TechnicalReportModel {
       diagnostico: json['diagnostico'] ?? '',
       recomendaciones: json['recomendaciones'] ?? '',
       repuestosUsados: json['repuestos_usados'],
+      imagenesRepuestos: json['imagenes_repuestos'],
       estadoRevision: json['estado_revision'] ?? 'PENDIENTE',
       observacionesAdmin: json['observaciones_admin'],
     );
@@ -44,6 +47,7 @@ class TechnicalReportModel {
       'diagnostico': diagnostico,
       'recomendaciones': recomendaciones,
       'repuestos_usados': repuestosUsados,
+      'imagenes_repuestos': imagenesRepuestos,
       'estado_revision': estadoRevision,
       'observaciones_admin': observacionesAdmin,
     };

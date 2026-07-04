@@ -7,6 +7,7 @@ import '../../../widgets/ui_components.dart';
 import '../../../providers/mechanic_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/service_order_model.dart';
+import 'technical_report_dialog.dart';
 
 class AssignedOrdersTab extends StatefulWidget {
   const AssignedOrdersTab({super.key});
@@ -45,7 +46,8 @@ class _AssignedOrdersTabState extends State<AssignedOrdersTab> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-            child: Center(
+            child: Align(
+              alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1280),
                 child: Column(
@@ -188,8 +190,12 @@ class _AssignedOrderCard extends StatelessWidget {
                   icon: Icons.note_add_rounded,
                   isPrimary: true,
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Función en construcción')),
+                    showDialog(
+                      context: context,
+                      builder: (_) => TechnicalReportDialog(
+                        idOrden: order.idOrden,
+                        title: order.numeroOrden.isNotEmpty ? order.numeroOrden : 'ORD-${order.idOrden}',
+                      ),
                     );
                   },
                 ),

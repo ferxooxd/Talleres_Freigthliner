@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/ui_components.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/mechanic_provider.dart';
+import '../../../models/service_order_model.dart';
 
 class CompletedHistoryTab extends StatelessWidget {
   const CompletedHistoryTab({super.key});
@@ -12,7 +15,8 @@ class CompletedHistoryTab extends StatelessWidget {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-      child: Center(
+      child: Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1280),
           child: Column(
@@ -33,15 +37,28 @@ class CompletedHistoryTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              
-              // Aquí usarías ListView.builder para mostrar varias tareas.
-              ...List.generate(3, (index) {
-                return _CompletedHistoryCard(
-                  vehicle: index == 0 ? 'Ford F-150 2020' : (index == 1 ? 'Nissan Sentra 2019' : 'Honda CR-V 2021'),
-                  plate: index == 0 ? 'XYZ-987' : (index == 1 ? 'DEF-456' : 'GHI-789'),
-                  date: index == 0 ? 'Ayer, 04:15 PM' : (index == 1 ? 'Hace 2 días' : 'Hace 3 días'),
-                );
-              }),
+              Consumer<MechanicProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isLoading && provider.completedOrders.isEmpty) {
+                    return const Center(child: CircularProgressIndicator(color: AppTheme.green));
+                  }
+                  
+                  if (provider.completedOrders.isEmpty) {
+                    return const Text('No tienes trabajos completados.', style: TextStyle(color: Colors.white70));
+                  }
+
+                  return Column(
+                    children: provider.completedOrders.map((order) {
+                      return _CompletedHistoryCard(
+                        vehicle: order.numeroOrden.isNotEmpty ? order.numeroOrden : 'ORD-${order.idOrden}',
+                        plate: 'Vehículo ID: ${order.idVehiculo}',
+                        date: '${order.fechaIngreso} ${order.horaIngreso}',
+                        order: order,
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -55,11 +72,13 @@ class _CompletedHistoryCard extends StatelessWidget {
     required this.vehicle,
     required this.plate,
     required this.date,
+    required this.order,
   });
 
   final String vehicle;
   final String plate;
   final String date;
+  final ServiceOrderModel order;
 
   @override
   Widget build(BuildContext context) {
@@ -120,11 +139,97 @@ class _CompletedHistoryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const InfoLine(label: 'Servicio:', value: 'Mantenimiento Preventivo 50K'),
+          const SizedBox(height: 16),
+          InfoLine(label: 'Trabajos:', value: order.trabajosARealizar),
           const SizedBox(height: 8),
-          InfoLine(label: 'Fecha:', value: date),
-          const SizedBox(height: 8),
-          const InfoLine(label: 'Tiempo:', value: '3 horas 15 min'),
+          InfoLine(label: 'Ingreso:', value: date),
+          if (order.fechaSalida != null) ...[
+            const SizedBox(height: 8),
+            InfoLine(label: 'Salida:', value: '${order.fechaSalida} ${order.horaSalida ?? ""}'),
+          ],
+          if (order.informeTrabajo != null && order.informeTrabajo!.trim().isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Builder(
+              builder: (context) {
+                final rawText = order.informeTrabajo!;
+                String displayText = rawText;
+                List<String> imageUrls = [];
+                
+                final imgRegex = RegExp(r'\[IMAGENES\](.*?)\[/IMAGENES\]');
+                final match = imgRegex.firstMatch(rawText);
+                if (match != null) {
+                  final imagesCsv = match.group(1) ?? '';
+                  imageUrls = imagesCsv.split(',').where((u) => u.trim().isNotEmpty).toList();
+                  displayText = rawText.replaceAll(imgRegex, '').trim();
+                }
+                
+                const apiBase = 'http://192.168.1.7:8000';
+
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF151515),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF333333)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Mi Informe Técnico', style: GoogleFonts.dmSans(color: AppTheme.green, fontSize: 13, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 6),
+                      Text(displayText, style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13)),
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text('Evidencia:', style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 12)),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 70,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: imageUrls.length,
+                            separatorBuilder: (_, __) => const SizedBox(width: 8),
+                            itemBuilder: (context, i) {
+                              final fullUrl = '$apiBase${imageUrls[i]}';
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(fullUrl, fit: BoxFit.contain),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    fullUrl,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      width: 70,
+                                      height: 70,
+                                      color: const Color(0xFF222222),
+                                      child: const Icon(Icons.broken_image, color: Colors.white38),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ],
       ),
     );

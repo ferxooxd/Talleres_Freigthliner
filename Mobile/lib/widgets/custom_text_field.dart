@@ -11,6 +11,8 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final String? errorText;
+  final int maxLines;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     super.key,
@@ -21,6 +23,8 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.inputFormatters,
     this.errorText,
+    this.maxLines = 1,
+    this.validator,
   });
 
   @override
@@ -37,11 +41,13 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 5),
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
+          maxLines: maxLines,
+          validator: validator,
           style: GoogleFonts.dmSans(
             color: AppTheme.text,
             fontSize: 13,

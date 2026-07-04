@@ -8,13 +8,15 @@ class TechnicalReportRegister(BaseModel):
     id_orden: int
     diagnostico: str
     recomendaciones: str
-    repuestos_usados: str | None
+    repuestos_usados: str | None = None
+    imagenes_repuestos: str | None = None
 
 
 class TechnicalReportUpdate(BaseModel):
     diagnostico: str | None = None
     recomendaciones: str | None = None
     repuestos_usados: str | None = None
+    imagenes_repuestos: str | None = None
 
 
 class TechnicalReportResponse(BaseModel):
@@ -24,7 +26,8 @@ class TechnicalReportResponse(BaseModel):
     fecha_reporte: datetime
     diagnostico: str
     recomendaciones: str
-    repuestos_usados: str | None
+    repuestos_usados: str | None = None
+    imagenes_repuestos: str | None = None
     estado_revision: str
     observaciones_admin: str | None
 

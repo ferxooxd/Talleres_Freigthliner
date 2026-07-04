@@ -43,11 +43,15 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
             label: const Text('Nueva Orden', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
           body: () {
-            if (provider.isLoading && provider.serviceOrders.isEmpty) {
+            final activeOrders = provider.serviceOrders.where((o) => 
+                o.estadoOrden == 'EN_DIAGNOSTICO' || o.estadoOrden == 'EN_REPARACION'
+            ).toList();
+
+            if (provider.isLoading && activeOrders.isEmpty) {
               return const Center(child: CircularProgressIndicator(color: AppTheme.green));
             }
 
-            if (provider.serviceOrders.isEmpty) {
+            if (activeOrders.isEmpty) {
               return const Center(
                 child: Text('No hay órdenes de servicio activas.', style: TextStyle(color: Colors.white70)),
               );
@@ -60,9 +64,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               },
               child: ListView.builder(
                 padding: const EdgeInsets.all(16).copyWith(bottom: 80),
-                itemCount: provider.serviceOrders.length,
+                itemCount: activeOrders.length,
                 itemBuilder: (context, index) {
-                  final order = provider.serviceOrders[index];
+                  final order = activeOrders[index];
                   return _buildOrderCard(context, order, provider);
                 },
               ),
@@ -172,6 +176,102 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               ),
             ),
             const SizedBox(height: 12),
+            if (hasReport) ...[
+              Builder(
+                builder: (context) {
+                  final rawText = order.informeTrabajo!;
+                  // Parse out images from [IMAGENES]...[/IMAGENES] markers
+                  String displayText = rawText;
+                  List<String> imageUrls = [];
+                  
+                  final imgRegex = RegExp(r'\[IMAGENES\](.*?)\[/IMAGENES\]');
+                  final match = imgRegex.firstMatch(rawText);
+                  if (match != null) {
+                    final imagesCsv = match.group(1) ?? '';
+                    imageUrls = imagesCsv.split(',').where((u) => u.trim().isNotEmpty).toList();
+                    displayText = rawText.replaceAll(imgRegex, '').trim();
+                  }
+                  
+                  // Build the base URL for images (strip /api/v1 from the API base)
+                  const apiBase = 'http://192.168.1.7:8000';
+
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF151515),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF333333)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Informe del Mecánico', style: GoogleFonts.dmSans(color: AppTheme.green, fontSize: 12, fontWeight: FontWeight.bold)),
+                            IconButton(
+                              onPressed: () => _editReport(context, order, provider),
+                              icon: const Icon(Icons.edit, size: 16, color: AppTheme.green),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(displayText, style: GoogleFonts.dmSans(color: Colors.white, fontSize: 14)),
+                        if (imageUrls.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text('Fotos de repuestos:', style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 12)),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 90,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: imageUrls.length,
+                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              itemBuilder: (context, i) {
+                                final fullUrl = '$apiBase${imageUrls[i]}';
+                                return GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Image.network(fullUrl, fit: BoxFit.contain),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      fullUrl,
+                                      width: 90,
+                                      height: 90,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        width: 90,
+                                        height: 90,
+                                        color: const Color(0xFF222222),
+                                        child: const Icon(Icons.broken_image, color: Colors.white38),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+            const SizedBox(height: 12),
             if (isDelivered) ...[
               SizedBox(
                 width: double.infinity,
@@ -194,7 +294,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   label: const Text('Finalizar Orden'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.green,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     disabledBackgroundColor: const Color(0xFF222222),
                     disabledForegroundColor: Colors.white54,
                   ),
@@ -217,7 +317,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     );
   }
 
-  void _finishOrder(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
+  Future<void> _finishOrder(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
     try {
       await provider.finishServiceOrder(order.idOrden);
       if (context.mounted) {
@@ -232,6 +332,74 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
         );
       }
     }
+  }
+
+  Future<void> _editReport(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
+    final rawText = order.informeTrabajo ?? '';
+    
+    // Extraer imágenes para no perderlas
+    String textToEdit = rawText;
+    String imagesBlock = '';
+    
+    final imgRegex = RegExp(r'(\[IMAGENES\].*?\[/IMAGENES\])');
+    final match = imgRegex.firstMatch(rawText);
+    if (match != null) {
+      imagesBlock = match.group(1) ?? '';
+      textToEdit = rawText.replaceAll(imgRegex, '').trim();
+    }
+
+    final controller = TextEditingController(text: textToEdit);
+    bool isSaving = false;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF131A2A),
+              title: const Text('Editar Informe Técnico', style: TextStyle(color: Colors.white)),
+              content: SizedBox(
+                width: 400,
+                child: TextField(
+                  controller: controller,
+                  maxLines: 8,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Edite el informe del mecánico...',
+                    hintStyle: TextStyle(color: Colors.white54),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.pop(ctx),
+                  child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+                ),
+                ElevatedButton(
+                  onPressed: isSaving ? null : () async {
+                    setState(() => isSaving = true);
+                    final newText = controller.text.trim();
+                    final finalText = imagesBlock.isNotEmpty ? '$newText\n\n$imagesBlock' : newText;
+                    
+                    try {
+                      await provider.updateOrderReport(order.idOrden, finalText);
+                      if (context.mounted) Navigator.pop(ctx);
+                    } catch (e) {
+                      setState(() => isSaving = false);
+                      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.green, foregroundColor: Colors.black),
+                  child: isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)) : const Text('Guardar'),
+                ),
+              ],
+            );
+          }
+        );
+      }
+    );
   }
 
   void _downloadPDF(BuildContext context, ServiceOrderModel order, UserModel? mechanic) async {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../providers/mechanic_provider.dart';
 
 class MechanicScheduleTab extends StatelessWidget {
   const MechanicScheduleTab({super.key});
@@ -11,7 +13,8 @@ class MechanicScheduleTab extends StatelessWidget {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-      child: Center(
+      child: Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1280),
           child: Column(
@@ -34,15 +37,56 @@ class MechanicScheduleTab extends StatelessWidget {
               const SizedBox(height: 20),
               
               // Aquí usarías ListView.builder para mostrar la agenda.
-              ...List.generate(3, (index) {
-                return _ScheduleItemCard(
-                  day: (24 + index).toString(),
-                  month: 'OCT',
-                  time: index == 0 ? '08:00 AM' : (index == 1 ? '11:30 AM' : '02:00 PM'),
-                  service: index == 0 ? 'Revisión General' : (index == 1 ? 'Mantenimiento 10K' : 'Frenos'),
-                  vehicle: index == 0 ? 'Toyota Hilux (ABC-123)' : (index == 1 ? 'Ford Ranger (DEF-456)' : 'Kia Rio (GHI-789)'),
-                );
-              }),
+              Consumer<MechanicProvider>(
+                builder: (context, provider, child) {
+                  final orders = provider.assignedOrders;
+                  if (orders.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text('No tienes órdenes agendadas.', style: TextStyle(color: Colors.white70)),
+                    );
+                  }
+
+                  return Column(
+                    children: orders.map((order) {
+                      final dateParts = order.fechaIngreso.split('-');
+                      String day = '00';
+                      String monthStr = '00';
+                      if (dateParts.length >= 3) {
+                        day = dateParts[2];
+                        monthStr = dateParts[1];
+                      }
+
+                      String month = '';
+                      switch (monthStr) {
+                        case '01': month = 'ENE'; break;
+                        case '02': month = 'FEB'; break;
+                        case '03': month = 'MAR'; break;
+                        case '04': month = 'ABR'; break;
+                        case '05': month = 'MAY'; break;
+                        case '06': month = 'JUN'; break;
+                        case '07': month = 'JUL'; break;
+                        case '08': month = 'AGO'; break;
+                        case '09': month = 'SEP'; break;
+                        case '10': month = 'OCT'; break;
+                        case '11': month = 'NOV'; break;
+                        case '12': month = 'DIC'; break;
+                        default: month = 'MES';
+                      }
+
+                      final time = order.horaIngreso.isNotEmpty ? order.horaIngreso : '--:--';
+                      
+                      return _ScheduleItemCard(
+                        day: day,
+                        month: month,
+                        time: time,
+                        service: order.trabajosARealizar,
+                        vehicle: 'Cliente: ${order.clienteNombre}',
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),

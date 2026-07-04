@@ -2,7 +2,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
+import os
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -44,6 +46,10 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api/v1")
+
+# Asegurar que el directorio uploads existe antes de montarlo
+os.makedirs("uploads", exist_ok=True)
+app.mount("/static/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/", tags=["Health"])

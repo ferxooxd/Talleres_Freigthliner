@@ -6,6 +6,8 @@ class ServiceOrderModel {
   final int? idAgendamiento;
   final String fechaIngreso;
   final String horaIngreso;
+  final String? fechaSalida;
+  final String? horaSalida;
   final String clienteNombre;
   final String clienteIdentificacion;
   final String clienteTelefono;
@@ -25,6 +27,8 @@ class ServiceOrderModel {
     this.idAgendamiento,
     required this.fechaIngreso,
     required this.horaIngreso,
+    this.fechaSalida,
+    this.horaSalida,
     required this.clienteNombre,
     required this.clienteIdentificacion,
     required this.clienteTelefono,
@@ -46,6 +50,8 @@ class ServiceOrderModel {
       idAgendamiento: json['id_agendamiento'],
       fechaIngreso: json['fecha_ingreso']?.toString() ?? '',
       horaIngreso: json['hora_ingreso']?.toString() ?? '',
+      fechaSalida: json['fecha_salida']?.toString(),
+      horaSalida: json['hora_salida']?.toString(),
       clienteNombre: json['cliente_nombre']?.toString() ?? '',
       clienteIdentificacion: json['cliente_identificacion']?.toString() ?? '',
       clienteTelefono: json['cliente_telefono']?.toString() ?? '',

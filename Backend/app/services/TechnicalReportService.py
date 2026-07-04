@@ -24,6 +24,14 @@ class TechnicalReportService:
         report_dict["id_usuario"] = id_usuario
         db_report = TechnicalReport(**report_dict)
         db.add(db_report)
+        
+        # Update ServiceOrder.informe_trabajo so the frontend knows there's a report
+        images_section = ""
+        if report_data.imagenes_repuestos:
+            images_section = f"\n[IMAGENES]{report_data.imagenes_repuestos}[/IMAGENES]"
+        
+        order.informe_trabajo = f"Diagnóstico: {report_data.diagnostico}\nRecomendaciones: {report_data.recomendaciones or 'N/A'}{images_section}"
+        
         db.commit()
         db.refresh(db_report)
         return db_report

@@ -221,10 +221,30 @@ class AdminProvider with ChangeNotifier {
   Future<void> finishServiceOrder(int idOrden) async {
     _setLoading(true); _setError(null);
     try { 
-      // The update_order endpoint expects id_mecanico, informe_trabajo, estado_orden, fecha_salida, hora_salida optionally
+      await _repository.updateServiceOrder(idOrden, {'estado_orden': 'LISTO_PARA_ENTREGA'}); 
+      await fetchServiceOrders(); 
+      await fetchStats();
+    }
+    catch (e) { _setError(e.toString()); rethrow; }
+    finally { _setLoading(false); }
+  }
+
+  Future<void> deliverServiceOrder(int idOrden) async {
+    _setLoading(true); _setError(null);
+    try { 
       await _repository.updateServiceOrder(idOrden, {'estado_orden': 'ENTREGADO'}); 
       await fetchServiceOrders(); 
       await fetchStats();
+    }
+    catch (e) { _setError(e.toString()); rethrow; }
+    finally { _setLoading(false); }
+  }
+
+  Future<void> updateOrderReport(int idOrden, String informeTrabajo) async {
+    _setLoading(true); _setError(null);
+    try { 
+      await _repository.updateServiceOrder(idOrden, {'informe_trabajo': informeTrabajo}); 
+      await fetchServiceOrders(); 
     }
     catch (e) { _setError(e.toString()); rethrow; }
     finally { _setLoading(false); }

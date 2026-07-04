@@ -74,8 +74,8 @@ class _AdminBottomNav extends StatelessWidget {
         icon: Icons.build_circle_rounded,
       ),
       const _AdminNavItem(
-        label: 'Informes',
-        icon: Icons.assignment_rounded,
+        label: 'Historial',
+        icon: Icons.history_rounded,
       ),
       const _AdminNavItem(
         label: 'Chat',

@@ -57,11 +57,13 @@ class ServiceOrderService:
         # Validación de seguridad: No se puede finalizar sin reporte del mecánico
         nuevo_estado = update_dict.get("estado_orden")
         if nuevo_estado in [ServiceOrderState.LISTO_PARA_ENTREGA, ServiceOrderState.ENTREGADO]:
-            informe = update_dict.get("informe_trabajo", db_order.informe_trabajo)
-            if not informe or not informe.strip():
+            # Verificar si existe un Informe Técnico en la otra tabla
+            from app.models.TechnicalReportEntity import TechnicalReport
+            informe_tecnico = db.query(TechnicalReport).filter(TechnicalReport.id_orden == id_orden).first()
+            if not informe_tecnico:
                 raise HTTPException(
                     status_code=400, 
-                    detail="No puedes entregar el vehículo hasta que el mecánico escriba el informe del trabajo realizado."
+                    detail="No puedes entregar el vehículo hasta que el mecánico redacte el informe técnico."
                 )
 
         # Si cambia a ENTREGADO y no se proveyó fecha_salida, la llenamos automático
