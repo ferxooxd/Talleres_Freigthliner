@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Firebase
+    FIREBASE_CREDENTIALS_JSON: str | None = None
+
     class Config:
         env_file = ".env"
 

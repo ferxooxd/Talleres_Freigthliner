@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
@@ -83,9 +84,10 @@ class _MechanicDashboardScreenState extends State<MechanicDashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Chat de soporte próximamente...')),
-          );
+          context.push('/chat', extra: {
+            'contactId': 'admin',
+            'contactName': 'Soporte Técnico',
+          });
         },
         backgroundColor: AppTheme.green,
         child: const Icon(Icons.chat_rounded, color: Colors.black),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
@@ -53,10 +54,10 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implementación futura del chat con el administrador
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Chat con administrador próximamente...')),
-          );
+          context.push('/chat', extra: {
+            'contactId': 'admin', // En el backend, esto se resuelve automáticamente al ID del administrador.
+            'contactName': 'Administrador',
+          });
         },
         backgroundColor: AppTheme.green,
         child: const Icon(Icons.chat_rounded, color: Colors.black),

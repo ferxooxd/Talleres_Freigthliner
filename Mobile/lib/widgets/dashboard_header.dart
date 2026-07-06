@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import '../providers/chat_provider.dart';
 
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
@@ -60,26 +61,31 @@ class DashboardHeader extends StatelessWidget {
                 icon: Icons.notifications_none_rounded,
                 onTap: () {},
               ),
-              Positioned(
-                right: -2,
-                top: -6,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.green,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '3',
-                    style: GoogleFonts.dmSans(
-                      color: Colors.black,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
+              Consumer<ChatProvider>(
+                builder: (context, chatProvider, child) {
+                  if (chatProvider.unreadCount == 0) return const SizedBox();
+                  return Positioned(
+                    right: -2,
+                    top: -6,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${chatProvider.unreadCount}',
+                        style: GoogleFonts.dmSans(
+                          color: Colors.black,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),
@@ -167,6 +173,7 @@ class _HeaderAvatar extends StatelessWidget {
       ),
       onSelected: (value) async {
         if (value == 'logout') {
+          context.read<ChatProvider>().disconnect();
           await context.read<AuthProvider>().logout();
           if (context.mounted) {
             context.go('/login');

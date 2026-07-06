@@ -56,7 +56,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id_detalle')
     )
     op.create_index(op.f('ix_detalles_recibo_id_detalle'), 'detalles_recibo', ['id_detalle'], unique=False)
-    op.add_column('informes_tecnicos', sa.Column('estado_revision', sa.String(length=50), nullable=False))
+    op.add_column('informes_tecnicos', sa.Column('estado_revision', sa.String(length=50), nullable=False, server_default='PENDIENTE'))
     op.add_column('informes_tecnicos', sa.Column('observaciones_admin', sa.String(length=1000), nullable=True))
     # ### end Alembic commands ###
 

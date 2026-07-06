@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/chat_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_logo.dart';
 import '../../widgets/custom_text_field.dart';
@@ -54,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (provider.isMechanic) {
         context.go('/mechanic/dashboard');
       } else {
+        context.read<ChatProvider>().disconnect();
         await provider.logout();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

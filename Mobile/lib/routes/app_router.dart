@@ -7,6 +7,7 @@ import '../screens/dashboard/mechanic_dashboard_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/privacy_policy_screen.dart';
+import '../screens/chat/chat_screen.dart';
 
 GoRouter createAppRouter(AuthProvider authProvider) {
   return GoRouter(
@@ -74,6 +75,16 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/privacy',
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: '/chat',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ChatScreen(
+            contactId: extra?['contactId'],
+            contactName: extra?['contactName'] ?? 'Chat',
+          );
+        },
       ),
     ],
   );

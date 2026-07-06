@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/chat_provider.dart';
 import '../../widgets/ui_components.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -106,6 +107,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.logout_rounded,
                 isDanger: true,
                 onPressed: () async {
+                  context.read<ChatProvider>().disconnect();
                   await provider.logout();
                   if (context.mounted) {
                     context.go('/login');
@@ -160,6 +162,7 @@ class ProfileScreen extends StatelessWidget {
                                 backgroundColor: AppTheme.green,
                               ),
                             );
+                            context.read<ChatProvider>().disconnect();
                             await provider.logout();
                             if (context.mounted) {
                               context.go('/login');
