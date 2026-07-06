@@ -97,12 +97,14 @@ class _VehiclesTabState extends State<VehiclesTab> {
                         style: GoogleFonts.dmSans(color: AppTheme.textMuted),
                       ),
                     ),
-                  )
+                  ),
                 ];
               }
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 80.0), // Space for bottom buttons
+                padding: const EdgeInsets.only(
+                  bottom: 80.0,
+                ), // Space for bottom buttons
                 child: TabScaffold(
                   key: const ValueKey('vehicles'),
                   title: 'Mis vehiculos',
@@ -121,7 +123,11 @@ class _VehiclesTabState extends State<VehiclesTab> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: _showAcceptInvitationDialog,
-                    icon: const Icon(Icons.mail_outline, color: Colors.white, size: 20),
+                    icon: const Icon(
+                      Icons.mail_outline,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                     label: Text(
                       'Aceptar invitacion',
                       maxLines: 1,
@@ -134,7 +140,10 @@ class _VehiclesTabState extends State<VehiclesTab> {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF242424),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 14,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -158,7 +167,10 @@ class _VehiclesTabState extends State<VehiclesTab> {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.green,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 14,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -176,7 +188,7 @@ class _VehiclesTabState extends State<VehiclesTab> {
 
 class _VehicleSummaryCard extends StatelessWidget {
   const _VehicleSummaryCard({required this.vehicle});
-  
+
   final VehicleModel vehicle;
 
   void _asignarConductor(BuildContext context) {
@@ -184,6 +196,70 @@ class _VehicleSummaryCard extends StatelessWidget {
       context: context,
       builder: (context) => ShowInvitationDialog(placa: vehicle.placa),
     );
+  }
+
+  Future<void> _eliminarConductor(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF171717),
+        title: Text(
+          'Eliminar conductor',
+          style: GoogleFonts.rajdhani(
+            color: AppTheme.text,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'El conductor dejara de tener acceso al vehiculo ${vehicle.placa}.',
+          style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(
+              'Cancelar',
+              style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              'Eliminar',
+              style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null) return;
+
+    try {
+      await context.read<VehicleProvider>().removeDriver(vehicle.placa, userId);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Conductor eliminado exitosamente'),
+          backgroundColor: AppTheme.green,
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: AppTheme.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -233,8 +309,8 @@ class _VehicleSummaryCard extends StatelessWidget {
                     Row(
                       children: [
                         StatusChip(
-                          text: vehicle.rolVehiculo ?? 'Registrado', 
-                          color: AppTheme.blue
+                          text: vehicle.rolVehiculo ?? 'Registrado',
+                          color: AppTheme.blue,
                         ),
                       ],
                     ),
@@ -247,24 +323,101 @@ class _VehicleSummaryCard extends StatelessWidget {
             const SizedBox(height: 16),
             const Divider(color: Color(0xFF242424), height: 1),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () => _asignarConductor(context),
-                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                  label: Text('Asignar conductor', style: GoogleFonts.dmSans()),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.green,
-                    side: const BorderSide(color: AppTheme.green),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+            if (vehicle.conductorId == null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _asignarConductor(context),
+                    icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                    label: Text(
+                      'Asignar conductor',
+                      style: GoogleFonts.dmSans(),
                     ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.green,
+                      side: const BorderSide(color: AppTheme.green),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              _AssignedDriverInfo(
+                name: vehicle.conductorNombre ?? 'Conductor asignado',
+                phone: vehicle.conductorTelefono ?? 'Sin telefono',
+                onDelete: () => _eliminarConductor(context),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AssignedDriverInfo extends StatelessWidget {
+  const _AssignedDriverInfo({
+    required this.name,
+    required this.phone,
+    required this.onDelete,
+  });
+
+  final String name;
+  final String phone;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.greenBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTheme.borderGreen),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.person_pin_circle_rounded, color: AppTheme.green),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Conductor asignado',
+                  style: GoogleFonts.dmSans(
+                    color: AppTheme.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  name,
+                  style: GoogleFonts.dmSans(
+                    color: AppTheme.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Telefono: $phone',
+                  style: GoogleFonts.dmSans(
+                    color: AppTheme.textMuted,
+                    fontSize: 13,
                   ),
                 ),
               ],
-            )
-          ]
+            ),
+          ),
+          IconButton(
+            tooltip: 'Eliminar conductor',
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.red),
+          ),
         ],
       ),
     );

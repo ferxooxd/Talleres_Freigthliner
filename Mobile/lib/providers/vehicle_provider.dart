@@ -4,7 +4,7 @@ import '../repositories/vehicle_repository.dart';
 
 class VehicleProvider extends ChangeNotifier {
   final VehicleRepository _repository = VehicleRepository();
-  
+
   List<VehicleModel> _vehicles = [];
   List<dynamic> _activeServiceOrders = [];
   bool _isLoading = false;
@@ -74,6 +74,23 @@ class VehicleProvider extends ChangeNotifier {
     try {
       await _repository.redeemInvitation(codigoSecreto);
       // Reload vehicles because a new one was added to the list
+      await loadMyVehicles(userId);
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      throw Exception(_error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeDriver(String placa, int userId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _repository.removeDriver(placa);
       await loadMyVehicles(userId);
     } catch (e) {
       _error = e.toString().replaceAll('Exception: ', '');

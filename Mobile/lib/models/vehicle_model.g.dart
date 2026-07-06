@@ -7,13 +7,16 @@ part of 'vehicle_model.dart';
 // **************************************************************************
 
 VehicleModel _$VehicleModelFromJson(Map<String, dynamic> json) => VehicleModel(
-      idVehiculo: (json['id_vehiculo'] as num).toInt(),
-      placa: json['placa'] as String,
-      marca: json['marca'] as String,
-      modelo: json['modelo'] as String,
-      tipoVehiculo: json['tipo_vehiculo'] as String,
-      rolVehiculo: json['rol_vehiculo'] as String?,
-    );
+  idVehiculo: (json['id_vehiculo'] as num).toInt(),
+  placa: json['placa'] as String,
+  marca: json['marca'] as String,
+  modelo: json['modelo'] as String,
+  tipoVehiculo: json['tipo_vehiculo'] as String,
+  rolVehiculo: json['rol_vehiculo'] as String?,
+  conductorId: (json['conductor_id'] as num?)?.toInt(),
+  conductorNombre: json['conductor_nombre'] as String?,
+  conductorTelefono: json['conductor_telefono'] as String?,
+);
 
 Map<String, dynamic> _$VehicleModelToJson(VehicleModel instance) =>
     <String, dynamic>{
@@ -23,4 +26,7 @@ Map<String, dynamic> _$VehicleModelToJson(VehicleModel instance) =>
       'modelo': instance.modelo,
       'tipo_vehiculo': instance.tipoVehiculo,
       'rol_vehiculo': instance.rolVehiculo,
+      'conductor_id': instance.conductorId,
+      'conductor_nombre': instance.conductorNombre,
+      'conductor_telefono': instance.conductorTelefono,
     };

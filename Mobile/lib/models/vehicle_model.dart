@@ -13,6 +13,12 @@ class VehicleModel {
   final String tipoVehiculo;
   @JsonKey(name: 'rol_vehiculo')
   final String? rolVehiculo;
+  @JsonKey(name: 'conductor_id')
+  final int? conductorId;
+  @JsonKey(name: 'conductor_nombre')
+  final String? conductorNombre;
+  @JsonKey(name: 'conductor_telefono')
+  final String? conductorTelefono;
 
   VehicleModel({
     required this.idVehiculo,
@@ -21,8 +27,12 @@ class VehicleModel {
     required this.modelo,
     required this.tipoVehiculo,
     this.rolVehiculo,
+    this.conductorId,
+    this.conductorNombre,
+    this.conductorTelefono,
   });
 
-  factory VehicleModel.fromJson(Map<String, dynamic> json) => _$VehicleModelFromJson(json);
+  factory VehicleModel.fromJson(Map<String, dynamic> json) =>
+      _$VehicleModelFromJson(json);
   Map<String, dynamic> toJson() => _$VehicleModelToJson(this);
 }

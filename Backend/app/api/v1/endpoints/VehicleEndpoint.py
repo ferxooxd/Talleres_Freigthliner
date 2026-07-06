@@ -51,6 +51,15 @@ def redeem_invitation(data: InvitationRedeemRequest, db: Session = Depends(get_d
     return VehicleService.redeem_invitation(db=db, codigo_secreto=data.codigo_secreto, user_id=current_user.id_usuario)
 
 
+@router.delete("/{placa}/driver")
+def remove_driver(placa: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """
+    Elimina al conductor asignado a un vehiculo.
+    Solo el propietario puede ejecutar esta accion.
+    """
+    return VehicleService.remove_driver(db=db, placa=placa, user_id=current_user.id_usuario)
+
+
 @router.get("/mine", response_model=List[MyVehicleResponse])
 def my_vehicles(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """

@@ -42,14 +42,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _correoController.text.isEmpty ||
         _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, llena los campos obligatorios'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Por favor, llena los campos obligatorios'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
     if (!_correoController.text.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, ingresa un correo válido (debe contener @)'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text(
+            'Por favor, ingresa un correo válido (debe contener @)',
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -83,22 +91,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Registro exitoso'),
+          backgroundColor: Colors.green,
+        ),
       );
       context.go('/login');
     } else {
       if (provider.errorMessage != null) {
-        final error = provider.errorMessage!.toLowerCase();
+        final message = provider.errorMessage!;
+        final error = message.toLowerCase();
         setState(() {
           if (error.contains('correo') || error.contains('email')) {
-            _correoError = 'Verifica que tus datos sean correctos';
+            _correoError = message;
           } else if (error.contains('teléfono') || error.contains('telefono')) {
-            _telefonoError = 'Verifica que tus datos sean correctos';
+            _telefonoError = message;
           } else if (error.contains('cédula') || error.contains('cedula')) {
-            _cedulaError = 'Verifica que tus datos sean correctos';
+            _cedulaError = message;
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Verifica que tus datos sean correctos'), backgroundColor: Colors.red),
+              SnackBar(content: Text(message), backgroundColor: Colors.red),
             );
           }
         });
@@ -227,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

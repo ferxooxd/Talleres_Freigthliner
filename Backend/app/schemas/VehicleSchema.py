@@ -24,3 +24,6 @@ class VehicleResponse(VehicleBase):
 class MyVehicleResponse(VehicleBase):
     id_vehiculo: int
     rol_vehiculo: str  # 'Propietario' o 'Conductor'
+    conductor_id: Optional[int] = None
+    conductor_nombre: Optional[str] = None
+    conductor_telefono: Optional[str] = None

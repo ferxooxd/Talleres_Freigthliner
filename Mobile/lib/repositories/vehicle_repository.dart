@@ -12,7 +12,9 @@ class VehicleRepository {
       }
       return [];
     } on DioException catch (e) {
-      throw Exception(e.response?.data['detail'] ?? 'Error al obtener los vehiculos');
+      throw Exception(
+        e.response?.data['detail'] ?? 'Error al obtener los vehiculos',
+      );
     } catch (e) {
       throw Exception('Error inesperado al obtener los vehiculos');
     }
@@ -20,7 +22,9 @@ class VehicleRepository {
 
   Future<List<dynamic>> getActiveServiceOrders(int userId) async {
     try {
-      final response = await apiClient.get('/service-orders/client/$userId/active');
+      final response = await apiClient.get(
+        '/service-orders/client/$userId/active',
+      );
       if (response.statusCode == 200) {
         return response.data;
       }
@@ -38,7 +42,9 @@ class VehicleRepository {
       }
       throw Exception('Error al registrar el vehiculo');
     } on DioException catch (e) {
-      throw Exception(e.response?.data['detail'] ?? 'Error de conexion con el servidor');
+      throw Exception(
+        e.response?.data['detail'] ?? 'Error de conexion con el servidor',
+      );
     } catch (e) {
       throw Exception('Error inesperado al registrar el vehiculo');
     }
@@ -52,7 +58,9 @@ class VehicleRepository {
       }
       throw Exception('Error al generar la invitacion');
     } on DioException catch (e) {
-      throw Exception(e.response?.data['detail'] ?? 'Error al conectar con el servidor');
+      throw Exception(
+        e.response?.data['detail'] ?? 'Error al conectar con el servidor',
+      );
     } catch (e) {
       throw Exception('Error inesperado al generar la invitacion');
     }
@@ -61,17 +69,31 @@ class VehicleRepository {
   Future<String> redeemInvitation(String codigoSecreto) async {
     try {
       final response = await apiClient.post(
-        '/vehicles/invitations/redeem', 
-        data: {'codigo_secreto': codigoSecreto}
+        '/vehicles/invitations/redeem',
+        data: {'codigo_secreto': codigoSecreto},
       );
       if (response.statusCode == 200) {
         return response.data['mensaje'];
       }
       throw Exception('Error al canjear la invitacion');
     } on DioException catch (e) {
-      throw Exception(e.response?.data['detail'] ?? 'Error al conectar con el servidor');
+      throw Exception(
+        e.response?.data['detail'] ?? 'Error al conectar con el servidor',
+      );
     } catch (e) {
       throw Exception('Error inesperado al canjear la invitacion');
+    }
+  }
+
+  Future<void> removeDriver(String placa) async {
+    try {
+      await apiClient.delete('/vehicles/$placa/driver');
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['detail'] ?? 'Error al eliminar el conductor',
+      );
+    } catch (e) {
+      throw Exception('Error inesperado al eliminar el conductor');
     }
   }
 }
