@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../widgets/ui_components.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -14,21 +15,22 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AuthProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
     const color = AppTheme.green;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF050607),
+      backgroundColor: AppTheme.bgColor(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.text),
+          icon: Icon(Icons.arrow_back_rounded, color: AppTheme.textColor(context)),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'Mi Cuenta',
           style: GoogleFonts.rajdhani(
-            color: AppTheme.text,
+            color: AppTheme.textColor(context),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -64,7 +66,7 @@ class ProfileScreen extends StatelessWidget {
             Text(
               '${provider.userName ?? ''} ${provider.userLastName ?? ''}'.trim(),
               style: GoogleFonts.rajdhani(
-                color: AppTheme.text,
+                color: AppTheme.textColor(context),
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
               ),
@@ -84,17 +86,70 @@ class ProfileScreen extends StatelessWidget {
                     title: 'Datos Personales',
                     color: color,
                   ),
-                  const Divider(color: Color(0xFF262626), height: 32),
+                  const Divider(height: 32),
                   _ProfileSetting(
                     icon: Icons.security_rounded,
                     title: 'Seguridad y Contraseña',
                     color: color,
                   ),
-                  const Divider(color: Color(0xFF262626), height: 32),
+                  const Divider(height: 32),
                   _ProfileSetting(
                     icon: Icons.help_outline_rounded,
                     title: 'Centro de Ayuda',
                     color: color,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            DashboardCard(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.cardColor(context),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.borderColor(context)),
+                    ),
+                    child: Icon(
+                      themeProvider.isDarkMode
+                          ? Icons.dark_mode_rounded
+                          : Icons.light_mode_rounded,
+                      color: color,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Apariencia',
+                          style: GoogleFonts.dmSans(
+                            color: AppTheme.textColor(context),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          themeProvider.isDarkMode ? 'Modo Oscuro' : 'Modo Claro',
+                          style: GoogleFonts.dmSans(
+                            color: AppTheme.textMutedColor(context),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: themeProvider.isDarkMode,
+                    activeColor: AppTheme.green,
+                    onChanged: (val) {
+                      context.read<ThemeProvider>().toggleTheme(val);
+                    },
                   ),
                 ],
               ),
@@ -126,21 +181,21 @@ class ProfileScreen extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      backgroundColor: const Color(0xFF171717),
+                      backgroundColor: AppTheme.cardColor(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       title: Text(
                         'Eliminar Cuenta',
                         style: GoogleFonts.rajdhani(
-                          color: AppTheme.text,
+                          color: AppTheme.textColor(context),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       content: Text(
                         '¿Estás seguro de que deseas eliminar tu cuenta?\n\nEsta acción es irreversible y perderás todo tu historial de servicios.',
                         style: GoogleFonts.dmSans(
-                          color: AppTheme.textMuted,
+                          color: AppTheme.textMutedColor(context),
                           fontSize: 14,
                         ),
                       ),
@@ -149,7 +204,7 @@ class ProfileScreen extends StatelessWidget {
                           onPressed: () => Navigator.of(ctx).pop(),
                           child: Text(
                             'Cancelar',
-                            style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                            style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                           ),
                         ),
                         TextButton(
@@ -208,9 +263,9 @@ class _ProfileSetting extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFF161616),
+            color: AppTheme.cardColor(context),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFF262626)),
+            border: Border.all(color: AppTheme.borderColor(context)),
           ),
           child: Icon(icon, color: color, size: 20),
         ),
@@ -219,15 +274,15 @@ class _ProfileSetting extends StatelessWidget {
           child: Text(
             title,
             style: GoogleFonts.dmSans(
-              color: AppTheme.text,
+              color: AppTheme.textColor(context),
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        const Icon(
+        Icon(
           Icons.chevron_right_rounded,
-          color: AppTheme.textDim,
+          color: AppTheme.textMutedColor(context),
         ),
       ],
     );

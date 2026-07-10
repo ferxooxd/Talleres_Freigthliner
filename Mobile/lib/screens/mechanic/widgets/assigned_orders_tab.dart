@@ -60,7 +60,7 @@ class _AssignedOrdersTabState extends State<AssignedOrdersTab> {
                         Text(
                           'Órdenes Asignadas',
                           style: GoogleFonts.rajdhani(
-                            color: AppTheme.text,
+                            color: AppTheme.textColor(context),
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
                           ),
@@ -69,7 +69,7 @@ class _AssignedOrdersTabState extends State<AssignedOrdersTab> {
                     ),
                     const SizedBox(height: 20),
                     if (provider.assignedOrders.isEmpty)
-                      const Text('No tienes órdenes asignadas actualmente.', style: TextStyle(color: Colors.white70))
+                      Text('No tienes órdenes asignadas actualmente.', style: TextStyle(color: AppTheme.textMutedColor(context)))
                     else
                       ...provider.assignedOrders.map((order) => _AssignedOrderCard(order: order)),
                   ],
@@ -93,9 +93,9 @@ class _AssignedOrderCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF101010),
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF262626), width: 1),
+        border: Border.all(color: AppTheme.borderColor(context), width: 1),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -124,7 +124,7 @@ class _AssignedOrderCard extends StatelessWidget {
                     Text(
                       'Placa: ${order.placaVehiculo ?? 'Sin Placa'}',
                       style: GoogleFonts.rajdhani(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -143,9 +143,9 @@ class _AssignedOrderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF161616),
+              color: AppTheme.cardColor(context),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF222222)),
+              border: Border.all(color: AppTheme.borderColor(context)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +153,7 @@ class _AssignedOrderCard extends StatelessWidget {
                 Text(
                   'Diagnóstico o Trabajos a Realizar:',
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textDim,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -162,7 +162,7 @@ class _AssignedOrderCard extends StatelessWidget {
                 Text(
                   order.trabajosARealizar,
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.text,
+                    color: AppTheme.textColor(context),
                     fontSize: 14,
                     height: 1.5,
                   ),

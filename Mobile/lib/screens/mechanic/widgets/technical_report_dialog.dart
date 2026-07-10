@@ -98,10 +98,10 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
     final isLoading = context.watch<MechanicProvider>().isLoading;
 
     return Dialog(
-      backgroundColor: const Color(0xFF131A2A),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF262626)),
+        side: BorderSide(color: AppTheme.borderColor(context)),
       ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
@@ -119,7 +119,7 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                     child: Text(
                       'Redactar Informe: ${widget.title}',
                       style: GoogleFonts.rajdhani(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -127,14 +127,14 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                   ),
                   IconButton(
                     onPressed: isLoading ? null : () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: AppTheme.textMuted),
+                    icon: Icon(Icons.close, color: AppTheme.textMutedColor(context)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ],
               ),
             ),
-            const Divider(color: Color(0xFF262626), height: 1),
+            Divider(color: AppTheme.borderColor(context), height: 1),
             // Form
             Expanded(
               child: SingleChildScrollView(
@@ -168,7 +168,7 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                       const SizedBox(height: 24),
                       Text(
                         'Imágenes de repuestos (Opcional)',
-                        style: GoogleFonts.dmSans(color: AppTheme.text, fontWeight: FontWeight.w600),
+                        style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 12),
                       Wrap(
@@ -184,7 +184,7 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                                   height: 80,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: const Color(0xFF262626)),
+                                    border: Border.all(color: AppTheme.borderColor(context)),
                                     image: DecorationImage(
                                       image: FileImage(File(entry.value)),
                                       fit: BoxFit.cover,
@@ -214,7 +214,7 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                               onTap: () {
                                 showModalBottomSheet(
                                   context: context,
-                                  backgroundColor: const Color(0xFF1E293B),
+                                  backgroundColor: AppTheme.cardColor(context),
                                   shape: const RoundedRectangleBorder(
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                   ),
@@ -222,16 +222,16 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
                                     child: Wrap(
                                       children: [
                                         ListTile(
-                                          leading: const Icon(Icons.camera_alt, color: AppTheme.text),
-                                          title: const Text('Tomar foto', style: TextStyle(color: AppTheme.text)),
+                                          leading: Icon(Icons.camera_alt, color: AppTheme.textColor(context)),
+                                          title: Text('Tomar foto', style: TextStyle(color: AppTheme.textColor(context))),
                                           onTap: () {
                                             Navigator.pop(ctx);
                                             _pickImage(ImageSource.camera);
                                           },
                                         ),
                                         ListTile(
-                                          leading: const Icon(Icons.photo_library, color: AppTheme.text),
-                                          title: const Text('Elegir de galería', style: TextStyle(color: AppTheme.text)),
+                                          leading: Icon(Icons.photo_library, color: AppTheme.textColor(context)),
+                                          title: Text('Elegir de galería', style: TextStyle(color: AppTheme.textColor(context))),
                                           onTap: () {
                                             Navigator.pop(ctx);
                                             _pickImage(ImageSource.gallery);
@@ -261,7 +261,7 @@ class _TechnicalReportDialogState extends State<TechnicalReportDialog> {
               ),
             ),
             // Footer
-            const Divider(color: Color(0xFF262626), height: 1),
+            Divider(color: AppTheme.borderColor(context), height: 1),
             Padding(
               padding: const EdgeInsets.all(20),
               child: CustomButton(

@@ -9,6 +9,7 @@ import 'providers/booking_provider.dart';
 import 'providers/admin_provider.dart';
 import 'providers/mechanic_provider.dart';
 import 'providers/chat_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => MechanicProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),
@@ -32,12 +34,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, _) {
+    return Consumer2<AuthProvider, ThemeProvider>(
+      builder: (context, authProvider, themeProvider, _) {
         return MaterialApp.router(
           title: 'TF Centro Automotriz',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
           routerConfig: createAppRouter(authProvider),
         );
       },

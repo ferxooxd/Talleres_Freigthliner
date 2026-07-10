@@ -54,11 +54,11 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppTheme.green,
               onPrimary: AppTheme.bg,
-              surface: Color(0xFF171717),
-              onSurface: AppTheme.text,
+              surface: AppTheme.cardColor(context),
+              onSurface: AppTheme.textColor(context),
             ),
           ),
           child: child!,
@@ -79,11 +79,11 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppTheme.green,
               onPrimary: AppTheme.bg,
-              surface: Color(0xFF171717),
-              onSurface: AppTheme.text,
+              surface: AppTheme.cardColor(context),
+              onSurface: AppTheme.textColor(context),
             ),
           ),
           child: child!,
@@ -138,7 +138,7 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: const Color(0xFF171717),
+          backgroundColor: AppTheme.cardColor(context),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
@@ -146,13 +146,13 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
               const SizedBox(width: 10),
               Text(
                 'No se pudo reprogramar',
-                style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold, fontSize: 20),
+                style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold, fontSize: 20),
               ),
             ],
           ),
           content: Text(
             error,
-            style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 15),
+            style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 15),
           ),
           actions: [
             TextButton(
@@ -168,10 +168,10 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF171717),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF2A2A2A)),
+        side: BorderSide(color: AppTheme.borderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -188,13 +188,13 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
                     Text(
                       'Reprogramar Cita',
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppTheme.textMuted),
+                      icon: Icon(Icons.close, color: AppTheme.textMutedColor(context)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -208,7 +208,7 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
                     );
                     return Text(
                       'Vehículo: ${vehiculo.placa}',
-                      style: GoogleFonts.dmSans(color: AppTheme.textDim, fontSize: 14),
+                      style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
                     );
                   },
                 ),
@@ -218,18 +218,18 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        icon: const Icon(Icons.calendar_today, color: AppTheme.textMuted, size: 18),
+                        icon: Icon(Icons.calendar_today, color: AppTheme.textMutedColor(context), size: 18),
                         label: Text(
                           _selectedDate == null 
                             ? 'Fecha' 
                             : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                          style: GoogleFonts.dmSans(color: AppTheme.text),
+                          style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: Color(0xFF2A2A2A)),
+                          side: BorderSide(color: AppTheme.borderColor(context)),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          backgroundColor: const Color(0xFF0A0A0A),
+                          backgroundColor: AppTheme.inputColor(context),
                         ),
                         onPressed: _pickDate,
                       ),
@@ -237,18 +237,18 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
-                        icon: const Icon(Icons.access_time, color: AppTheme.textMuted, size: 18),
+                        icon: Icon(Icons.access_time, color: AppTheme.textMutedColor(context), size: 18),
                         label: Text(
                           _selectedTime == null 
                             ? 'Hora' 
                             : _selectedTime!.format(context),
-                          style: GoogleFonts.dmSans(color: AppTheme.text),
+                          style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: Color(0xFF2A2A2A)),
+                          side: BorderSide(color: AppTheme.borderColor(context)),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          backgroundColor: const Color(0xFF0A0A0A),
+                          backgroundColor: AppTheme.inputColor(context),
                         ),
                         onPressed: _pickTime,
                       ),
@@ -268,17 +268,17 @@ class _BookingRescheduleDialogState extends State<BookingRescheduleDialog> {
                 
                 TextFormField(
                   controller: _observacionesController,
-                  style: GoogleFonts.dmSans(color: AppTheme.text),
+                  style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText: 'Observaciones / Falla del vehículo',
                     alignLabelWithHint: true,
-                    labelStyle: GoogleFonts.dmSans(color: AppTheme.textDim),
+                    labelStyle: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                     filled: true,
-                    fillColor: const Color(0xFF0A0A0A),
+                    fillColor: AppTheme.inputColor(context),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                      borderSide: BorderSide(color: AppTheme.borderColor(context)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),

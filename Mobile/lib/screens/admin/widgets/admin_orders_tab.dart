@@ -34,10 +34,14 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
           floatingActionButton: FloatingActionButton.extended(
             backgroundColor: AppTheme.green,
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => const ServiceOrderFormDialog(),
-              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ServiceOrderFormDialog()),
+              ).then((result) {
+                if (result == true) {
+                  provider.fetchServiceOrders();
+                }
+              });
             },
             icon: const Icon(Icons.add, color: Colors.white),
             label: const Text('Nueva Orden', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -52,8 +56,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
             }
 
             if (activeOrders.isEmpty) {
-              return const Center(
-                child: Text('No hay órdenes de servicio activas.', style: TextStyle(color: Colors.white70)),
+              return Center(
+                child: Text('No hay órdenes de servicio activas.', style: TextStyle(color: AppTheme.textMutedColor(context))),
               );
             }
 
@@ -92,10 +96,10 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     final isDelivered = order.estadoOrden == 'ENTREGADO';
 
     return Card(
-      color: const Color(0xFF0A0A0A),
+      color: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF242424)),
+        side: BorderSide(color: AppTheme.borderColor(context)),
       ),
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -123,7 +127,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                 ),
                 Text(
                   '${order.fechaIngreso} ${order.horaIngreso}',
-                  style: GoogleFonts.dmSans(color: AppTheme.textDim, fontSize: 12),
+                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12),
                 ),
               ],
             ),
@@ -137,9 +141,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF151515),
+                color: AppTheme.inputColor(context),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF333333)),
+                border: Border.all(color: AppTheme.borderColor(context)),
               ),
               child: Row(
                 children: [
@@ -149,13 +153,13 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Mecánico Asignado', style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 12)),
+                        Text('Mecánico Asignado', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12)),
                         Text(
                           isAssigned 
                             ? (assignedMechanic != null ? '${assignedMechanic.nombre} ${assignedMechanic.apellido}' : 'Cargando...')
                             : 'Sin Asignar',
                           style: GoogleFonts.rajdhani(
-                            color: Colors.white,
+                            color: AppTheme.textColor(context),
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -200,9 +204,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF151515),
+                      color: AppTheme.inputColor(context),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFF333333)),
+                      border: Border.all(color: AppTheme.borderColor(context)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,10 +224,10 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(displayText, style: GoogleFonts.dmSans(color: Colors.white, fontSize: 14)),
+                        Text(displayText, style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontSize: 14)),
                         if (imageUrls.isNotEmpty) ...[
                           const SizedBox(height: 12),
-                          Text('Fotos de repuestos:', style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 12)),
+                          Text('Fotos de repuestos:', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12)),
                           const SizedBox(height: 8),
                           SizedBox(
                             height: 90,
@@ -256,8 +260,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                                       errorBuilder: (_, __, ___) => Container(
                                         width: 90,
                                         height: 90,
-                                        color: const Color(0xFF222222),
-                                        child: const Icon(Icons.broken_image, color: Colors.white38),
+                                        color: AppTheme.borderColor(context),
+                                        child: Icon(Icons.broken_image, color: AppTheme.textMutedColor(context)),
                                       ),
                                     ),
                                   ),
@@ -281,8 +285,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   icon: const Icon(Icons.picture_as_pdf),
                   label: const Text('Descargar Orden (PDF)'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Color(0xFF444444)),
+                    foregroundColor: AppTheme.textColor(context),
+                    side: BorderSide(color: AppTheme.borderColor(context)),
                   ),
                 ),
               ),
@@ -309,8 +313,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.green,
                     foregroundColor: Colors.black,
-                    disabledBackgroundColor: const Color(0xFF222222),
-                    disabledForegroundColor: Colors.white54,
+                    disabledBackgroundColor: AppTheme.inputColor(context),
+                    disabledForegroundColor: AppTheme.textMutedColor(context),
                   ),
                 ),
               ),
@@ -352,16 +356,16 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.bg,
-        title: const Text('Confirmar Entrega Física', style: TextStyle(color: Colors.white)),
-        content: const Text(
+        backgroundColor: AppTheme.bgColor(context),
+        title: Text('Confirmar Entrega Física', style: TextStyle(color: AppTheme.textColor(context))),
+        content: Text(
           '¿Está seguro de que el vehículo va a salir del taller? Esta acción cambiará el estado a ENTREGADO.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppTheme.textMutedColor(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.amber, foregroundColor: Colors.black),
@@ -413,25 +417,25 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
         return StatefulBuilder(
           builder: (ctx, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF131A2A),
-              title: const Text('Editar Informe Técnico', style: TextStyle(color: Colors.white)),
+              backgroundColor: AppTheme.cardColor(context),
+              title: Text('Editar Informe Técnico', style: TextStyle(color: AppTheme.textColor(context))),
               content: SizedBox(
                 width: 400,
                 child: TextField(
                   controller: controller,
                   maxLines: 8,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  style: TextStyle(color: AppTheme.textColor(context)),
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
                     hintText: 'Edite el informe del mecánico...',
-                    hintStyle: TextStyle(color: Colors.white54),
+                    hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
                   ),
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: isSaving ? null : () => Navigator.pop(ctx),
-                  child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+                  child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
                 ),
                 ElevatedButton(
                   onPressed: isSaving ? null : () async {
@@ -476,19 +480,19 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: Colors.white54),
+          Icon(icon, size: 16, color: AppTheme.textMutedColor(context)),
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(
-              color: Colors.white54,
+            style: TextStyle(
+              color: AppTheme.textMutedColor(context),
               fontWeight: FontWeight.bold,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.textColor(context)),
             ),
           ),
         ],
@@ -501,7 +505,7 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF101010),
+      backgroundColor: AppTheme.cardColor(context),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) {
         return Padding(
@@ -521,11 +525,11 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               const SizedBox(height: 8),
               Text(
                 'Selecciona el mecánico para la ${order.numeroOrden}',
-                style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 14),
+                style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
               ),
-              const Divider(color: Color(0xFF242424), height: 32),
+              Divider(color: AppTheme.borderColor(context), height: 32),
               if (mechanics.isEmpty)
-                const Center(child: Text('No hay mecánicos registrados.', style: TextStyle(color: Colors.white54)))
+                Center(child: Text('No hay mecánicos registrados.', style: TextStyle(color: AppTheme.textMutedColor(context))))
               else
                 ...mechanics.map((m) => ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -533,9 +537,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                     backgroundColor: AppTheme.green,
                     child: Icon(Icons.person, color: Colors.black),
                   ),
-                  title: Text('${m.nombre} ${m.apellido}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(m.especialidad ?? 'Mecánico General', style: const TextStyle(color: Colors.white54)),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.white54),
+                  title: Text('${m.nombre} ${m.apellido}', style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
+                  subtitle: Text(m.especialidad ?? 'Mecánico General', style: TextStyle(color: AppTheme.textMutedColor(context))),
+                  trailing: Icon(Icons.chevron_right, color: AppTheme.textMutedColor(context)),
                   onTap: () async {
                     Navigator.pop(context);
                     try {

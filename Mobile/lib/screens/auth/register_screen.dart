@@ -122,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.bgColor(context),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -130,9 +131,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             constraints: const BoxConstraints(maxWidth: 450),
             padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: AppTheme.cardColor(context),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border, width: 0.5),
+              border: Border.all(color: AppTheme.borderColor(context), width: 0.5),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -149,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Regístrate como cliente en TF Centro Automotriz',
                   style: GoogleFonts.dmSans(
                     fontSize: 12,
-                    color: AppTheme.textDim,
+                    color: AppTheme.textMutedColor(context),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -224,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       '¿Ya tienes cuenta? ',
                       style: GoogleFonts.dmSans(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: AppTheme.textMutedColor(context),
                       ),
                     ),
                     GestureDetector(

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../core/theme/app_theme.dart';
 
 class ChatScreen extends StatefulWidget {
   final dynamic contactId;
@@ -73,7 +74,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final chatProvider = context.watch<ChatProvider>();
 
     return Scaffold(
+      backgroundColor: AppTheme.bgColor(context),
       appBar: AppBar(
+        backgroundColor: AppTheme.bgColor(context),
+        foregroundColor: AppTheme.textColor(context),
         title: Text(widget.contactName),
       ),
       body: Column(
@@ -121,18 +125,19 @@ class _ChatScreenState extends State<ChatScreen> {
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: isMe
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey[800],
+                                ? AppTheme.green
+                                : AppTheme.cardColor(context),
                             borderRadius: BorderRadius.circular(16).copyWith(
                               bottomRight:
                                   isMe ? const Radius.circular(0) : null,
                               bottomLeft:
                                   !isMe ? const Radius.circular(0) : null,
                             ),
+                            border: isMe ? null : Border.all(color: AppTheme.borderColor(context)),
                           ),
                           child: Text(
                             message.content,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: isMe ? Colors.black : AppTheme.textColor(context)),
                           ),
                         ),
                       );
@@ -150,11 +155,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       maxLength: 2000,
                       maxLengthEnforcement:
                           MaxLengthEnforcement.enforced,
+                      style: TextStyle(color: AppTheme.textColor(context)),
                       decoration: InputDecoration(
                         hintText: 'Escribe un mensaje...',
+                        hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
                         counterText: '', // Oculta el contador "0/2000"
+                        filled: true,
+                        fillColor: AppTheme.inputColor(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -164,9 +174,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   const SizedBox(width: 8),
                   CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: AppTheme.green,
                     child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white),
+                      icon: const Icon(Icons.send, color: Colors.black),
                       onPressed: _sendMessage,
                     ),
                   ),

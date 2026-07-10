@@ -54,12 +54,12 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Text(
+              Text(
                 'Estado del Taller',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.textColor(context),
                 ),
               ),
               const SizedBox(height: 24),
@@ -71,18 +71,21 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildStatCard(
+                    context,
                     'Citas Pendientes',
                     stats['citas_pendientes']?.toString() ?? '0',
                     Icons.calendar_today,
                     Colors.blue,
                   ),
                   _buildStatCard(
+                    context,
                     'Vehículos en Taller',
                     stats['vehiculos_en_taller']?.toString() ?? '0',
                     Icons.directions_car,
                     Colors.orange,
                   ),
                   _buildStatCard(
+                    context,
                     'Informes Pendientes',
                     stats['informes_pendientes']?.toString() ?? '0',
                     Icons.assignment_late,
@@ -97,15 +100,15 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -119,18 +122,18 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> {
           const SizedBox(height: 16),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppTheme.textColor(context),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              color: AppTheme.textMutedColor(context),
               fontSize: 14,
             ),
           ),

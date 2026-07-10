@@ -50,7 +50,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                   Text(
                     'Agendamiento',
                     style: GoogleFonts.rajdhani(
-                      color: AppTheme.text,
+                      color: AppTheme.textColor(context),
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -109,7 +109,7 @@ class _ScheduleHeroCard extends StatelessWidget {
                     Text(
                       'Agenda tu proximo servicio',
                       style: GoogleFonts.rajdhani(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
                       ),
@@ -118,7 +118,7 @@ class _ScheduleHeroCard extends StatelessWidget {
                     Text(
                       'Selecciona fecha, vehiculo y observaciones.',
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.textMuted,
+                        color: AppTheme.textMutedColor(context),
                         fontSize: 14,
                       ),
                     ),
@@ -189,7 +189,7 @@ class _MyBookingsList extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   'No tienes citas agendadas.',
-                  style: GoogleFonts.dmSans(color: Colors.white70),
+                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                 ),
               ],
             ),
@@ -234,7 +234,7 @@ class _BookingTile extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF171717),
+        backgroundColor: AppTheme.cardColor(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
@@ -243,7 +243,7 @@ class _BookingTile extends StatelessWidget {
             Expanded(
               child: Text(
                 'Aviso Importante',
-                style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold),
+                style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -252,7 +252,7 @@ class _BookingTile extends StatelessWidget {
           error.contains('3 horas') || error.contains('anticipación') || error.contains('anticipacion') || error.contains('contamos con usted')
               ? 'Lo sentimos, ya contamos contigo para este espacio y no es posible reprogramar o cancelar con menos de 3 horas de anticipación.\n\n¡Agradecemos mucho tu comprensión!'
               : error,
-          style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 15),
+          style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 15),
         ),
         actions: [
           TextButton(
@@ -276,20 +276,20 @@ class _BookingTile extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF171717),
+        backgroundColor: AppTheme.cardColor(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           '¿Cancelar esta cita?',
-          style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold),
+          style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
         ),
         content: Text(
           'Esta acción no se puede deshacer. La cita del ${booking.fechaCita} a las ${booking.horaCita} será cancelada.',
-          style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 14),
+          style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('No, volver', style: GoogleFonts.dmSans(color: AppTheme.textMuted)),
+            child: Text('No, volver', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context))),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -317,7 +317,7 @@ class _BookingTile extends StatelessWidget {
         DialogRoute(
           context: navigator.context,
           builder: (ctx) => AlertDialog(
-            backgroundColor: const Color(0xFF171717),
+            backgroundColor: AppTheme.cardColor(context),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
@@ -326,7 +326,7 @@ class _BookingTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Aviso Importante',
-                    style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -335,7 +335,7 @@ class _BookingTile extends StatelessWidget {
               error.contains('3 horas') || error.contains('anticipación') || error.contains('anticipacion') || error.contains('contamos con usted')
                   ? 'Lo sentimos, ya contamos contigo para este espacio y no es posible cancelar con menos de 3 horas de anticipación.\n\n¡Agradecemos mucho tu comprensión!'
                   : error,
-              style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 15),
+              style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 15),
             ),
             actions: [
               TextButton(
@@ -355,9 +355,9 @@ class _BookingTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: AppTheme.inputColor(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: AppTheme.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,7 +376,7 @@ class _BookingTile extends StatelessWidget {
                     return Text(
                       'Vehículo: ${vehiculo.placa}',
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -390,11 +390,11 @@ class _BookingTile extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: AppTheme.textDim, size: 16),
+              Icon(Icons.calendar_today, color: AppTheme.textMutedColor(context), size: 16),
               const SizedBox(width: 6),
               Text(
                 '${booking.fechaCita.toIso8601String().split('T').first}  •  ${booking.horaCita}',
-                style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 14),
+                style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
               ),
             ],
           ),
@@ -403,12 +403,12 @@ class _BookingTile extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.note_alt_outlined, color: AppTheme.textDim, size: 16),
+                Icon(Icons.note_alt_outlined, color: AppTheme.textMutedColor(context), size: 16),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     booking.observaciones!,
-                    style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 13),
+                    style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 13),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -441,7 +441,7 @@ class _BookingTile extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           booking.motivoRechazo!,
-                          style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13),
+                          style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontSize: 13),
                         ),
                       ],
                     ),
@@ -484,7 +484,7 @@ class _BookingTile extends StatelessWidget {
 class _ActiveOrdersList extends StatelessWidget {
   const _ActiveOrdersList();
 
-  Color _orderStatusColor(String status) {
+  Color _orderStatusColor(String status, BuildContext context) {
     switch (status) {
       case 'EN_DIAGNOSTICO':
         return AppTheme.amber;
@@ -493,7 +493,7 @@ class _ActiveOrdersList extends StatelessWidget {
       case 'LISTO_PARA_ENTREGA':
         return AppTheme.green;
       default:
-        return AppTheme.textMuted;
+        return AppTheme.textMutedColor(context);
     }
   }
 
@@ -528,7 +528,7 @@ class _ActiveOrdersList extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   'Ninguno de tus vehículos se encuentra actualmente en el taller.',
-                  style: GoogleFonts.dmSans(color: Colors.white70),
+                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                 ),
               ],
             ),
@@ -546,7 +546,7 @@ class _ActiveOrdersList extends StatelessWidget {
               const SizedBox(height: 18),
               ...orders.map((order) => _ActiveOrderTile(
                 order: order,
-                statusColor: _orderStatusColor(order.estadoOrden),
+                statusColor: _orderStatusColor(order.estadoOrden, context),
                 statusLabel: _orderStatusLabel(order.estadoOrden),
               )),
             ],
@@ -574,7 +574,7 @@ class _ActiveOrderTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: AppTheme.inputColor(context),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: statusColor.withOpacity(0.35)),
       ),
@@ -595,7 +595,7 @@ class _ActiveOrderTile extends StatelessWidget {
                     return Text(
                       'Vehículo: ${vehiculo.placa}',
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -609,11 +609,11 @@ class _ActiveOrderTile extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: AppTheme.textDim, size: 16),
+              Icon(Icons.calendar_today, color: AppTheme.textMutedColor(context), size: 16),
               const SizedBox(width: 6),
               Text(
                 'Ingreso: ${order.fechaIngreso}  •  ${order.horaIngreso}',
-                style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 14),
+                style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
               ),
             ],
           ),
@@ -621,12 +621,12 @@ class _ActiveOrderTile extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.handyman_rounded, color: AppTheme.textDim, size: 16),
+              Icon(Icons.handyman_rounded, color: AppTheme.textMutedColor(context), size: 16),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   order.trabajosARealizar,
-                  style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 13),
+                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 13),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -655,7 +655,7 @@ class _ServicePickerCard extends StatelessWidget {
             title: 'Servicios frecuentes',
           ),
           const SizedBox(height: 18),
-          const Wrap(
+          Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [

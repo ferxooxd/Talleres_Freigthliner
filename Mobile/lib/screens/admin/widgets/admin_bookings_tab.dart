@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/booking_model.dart';
-import 'service_order_form_dialog.dart';
 
 class AdminBookingsTab extends StatefulWidget {
   const AdminBookingsTab({super.key});
@@ -41,9 +40,9 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
             children: [
               _buildSectionTitle('Citas Pendientes', Icons.access_time, Colors.orange),
               if (pending.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('No hay citas pendientes', style: TextStyle(color: Colors.white54)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text('No hay citas pendientes', style: TextStyle(color: AppTheme.textMutedColor(context))),
                 )
               else
                 ...pending.map((b) => _buildBookingCard(context, b, true)),
@@ -51,9 +50,9 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
               const SizedBox(height: 24),
               _buildSectionTitle('Citas Confirmadas', Icons.check_circle, Colors.green),
               if (confirmed.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('No hay citas confirmadas', style: TextStyle(color: Colors.white54)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text('No hay citas confirmadas', style: TextStyle(color: AppTheme.textMutedColor(context))),
                 )
               else
                 ...confirmed.map((b) => _buildBookingCard(context, b, false)),
@@ -61,9 +60,9 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
               const SizedBox(height: 24),
               _buildSectionTitle('Citas Rechazadas / Canceladas', Icons.cancel, AppTheme.errorColor),
               if (rejected.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('No hay citas rechazadas', style: TextStyle(color: Colors.white54)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text('No hay citas rechazadas', style: TextStyle(color: AppTheme.textMutedColor(context))),
                 )
               else
                 ...rejected.map((b) => _buildBookingCard(context, b, false)),
@@ -83,8 +82,8 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
           const SizedBox(width: 8),
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppTheme.textColor(context),
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -101,10 +100,10 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
     if (booking.estadoConfirmacion == 'RECHAZADO' || booking.estadoConfirmacion == 'CANCELADO') statusColor = AppTheme.red;
 
     return Card(
-      color: const Color(0xFF0A0A0A),
+      color: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: const Color(0xFF2A2A2A)),
+        side: BorderSide(color: AppTheme.borderColor(context)),
       ),
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -117,8 +116,8 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
               children: [
                 Text(
                   'Cita #${booking.idAgendamiento}',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppTheme.textColor(context),
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -168,15 +167,15 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
                 booking.notasAdicionales!,
               ),
             if (booking.motivoRechazo != null && booking.motivoRechazo!.isNotEmpty) ...[
-              const Divider(color: Colors.white24, height: 24),
+              Divider(color: AppTheme.borderColor(context), height: 24),
               const Text(
                 'Motivo de Rechazo:',
                 style: TextStyle(color: AppTheme.errorColor, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              Text(booking.motivoRechazo!, style: const TextStyle(color: Colors.white)),
+              Text(booking.motivoRechazo!, style: TextStyle(color: AppTheme.textColor(context))),
             ],
-            const Divider(color: Color(0xFF242424)),
+            Divider(color: AppTheme.borderColor(context)),
             const SizedBox(height: 8),
             if (booking.estadoConfirmacion == 'PENDIENTE') ...[
               Row(
@@ -236,19 +235,19 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: Colors.white54),
+          Icon(icon, size: 16, color: AppTheme.textMutedColor(context)),
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(
-              color: Colors.white54,
+            style: TextStyle(
+              color: AppTheme.textMutedColor(context),
               fontWeight: FontWeight.bold,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.textColor(context)),
             ),
           ),
         ],
@@ -282,20 +281,20 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.surfaceColor,
-        title: const Text('Rechazar Cita', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Rechazar Cita', style: TextStyle(color: AppTheme.textColor(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               '¿Por qué vas a rechazar esta cita? Este motivo será visible para el cliente.',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: AppTheme.textMutedColor(context)),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
               maxLines: 3,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.textColor(context)),
               decoration: const InputDecoration(
                 labelText: 'Motivo de rechazo',
                 border: OutlineInputBorder(),
@@ -306,7 +305,7 @@ class _AdminBookingsTabState extends State<AdminBookingsTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),

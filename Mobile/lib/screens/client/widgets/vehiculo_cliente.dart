@@ -94,7 +94,7 @@ class _VehiclesTabState extends State<VehiclesTab> {
                       padding: const EdgeInsets.all(32.0),
                       child: Text(
                         'No tienes vehículos registrados.',
-                        style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                        style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                       ),
                     ),
                   ),
@@ -123,9 +123,9 @@ class _VehiclesTabState extends State<VehiclesTab> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: _showAcceptInvitationDialog,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.mail_outline,
-                      color: Colors.white,
+                      color: AppTheme.textColor(context),
                       size: 20,
                     ),
                     label: Text(
@@ -133,13 +133,13 @@ class _VehiclesTabState extends State<VehiclesTab> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.dmSans(
-                        color: Colors.white,
+                        color: AppTheme.textColor(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF242424),
+                      backgroundColor: AppTheme.inputColor(context),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 14,
@@ -202,24 +202,24 @@ class _VehicleSummaryCard extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF171717),
+        backgroundColor: AppTheme.cardColor(context),
         title: Text(
           'Eliminar conductor',
           style: GoogleFonts.rajdhani(
-            color: AppTheme.text,
+            color: AppTheme.textColor(context),
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'El conductor dejara de tener acceso al vehiculo ${vehicle.placa}.',
-          style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+          style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(
               'Cancelar',
-              style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+              style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
             ),
           ),
           ElevatedButton(
@@ -274,7 +274,7 @@ class _VehicleSummaryCard extends StatelessWidget {
                 height: 70,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: AppTheme.inputColor(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -291,7 +291,7 @@ class _VehicleSummaryCard extends StatelessWidget {
                     Text(
                       '${vehicle.marca} ${vehicle.modelo}',
                       style: GoogleFonts.rajdhani(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
@@ -301,7 +301,7 @@ class _VehicleSummaryCard extends StatelessWidget {
                       'Placa: ${vehicle.placa} - Tipo: ${vehicle.tipoVehiculo}',
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.textMuted,
+                        color: AppTheme.textMutedColor(context),
                         fontSize: 14,
                       ),
                     ),
@@ -321,7 +321,7 @@ class _VehicleSummaryCard extends StatelessWidget {
           ),
           if (vehicle.rolVehiculo == 'Propietario') ...[
             const SizedBox(height: 16),
-            const Divider(color: Color(0xFF242424), height: 1),
+            Divider(color: AppTheme.borderColor(context), height: 1),
             const SizedBox(height: 16),
             if (vehicle.conductorId == null)
               Row(
@@ -388,7 +388,7 @@ class _AssignedDriverInfo extends StatelessWidget {
                 Text(
                   'Conductor asignado',
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textMuted,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -397,7 +397,7 @@ class _AssignedDriverInfo extends StatelessWidget {
                 Text(
                   name,
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.text,
+                    color: AppTheme.textColor(context),
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),
@@ -406,7 +406,7 @@ class _AssignedDriverInfo extends StatelessWidget {
                 Text(
                   'Telefono: $phone',
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textMuted,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 13,
                   ),
                 ),

@@ -80,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.bgColor(context),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -88,9 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
             constraints: const BoxConstraints(maxWidth: 400),
             padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: AppTheme.cardColor(context),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border, width: 0.5),
+              border: Border.all(color: AppTheme.borderColor(context), width: 0.5),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -101,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'NIT: 7184810',
                   style: GoogleFonts.dmSans(
                     fontSize: 12,
-                    color: AppTheme.textDim,
+                    color: AppTheme.textMutedColor(context),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -133,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'No tienes cuenta? ',
                       style: GoogleFonts.dmSans(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: AppTheme.textMutedColor(context),
                       ),
                     ),
                     GestureDetector(

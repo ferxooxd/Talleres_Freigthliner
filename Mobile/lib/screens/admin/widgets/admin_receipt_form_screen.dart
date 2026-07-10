@@ -97,9 +97,10 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: AppTheme.bgColor(context),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceColor,
+        backgroundColor: AppTheme.bgColor(context),
+        foregroundColor: AppTheme.textColor(context),
         title: Text(widget.receipt == null ? 'Nuevo Documento' : 'Editar Documento'),
         actions: [
           ElevatedButton.icon(
@@ -134,8 +135,8 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
                 }
               }
             },
-            icon: const Icon(Icons.save, color: Colors.white),
-            label: const Text('Guardar', style: TextStyle(color: Colors.white)),
+            icon: Icon(Icons.save, color: AppTheme.textColor(context)),
+            label: Text('Guardar', style: TextStyle(color: AppTheme.textColor(context))),
           ),
           const SizedBox(width: 16),
         ],
@@ -148,23 +149,23 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                color: AppTheme.surfaceColor,
+                color: AppTheme.cardColor(context),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Información General', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('Información General', style: TextStyle(color: AppTheme.textColor(context), fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
                               value: _tipoDocumento,
-                              items: ['RECIBO', 'COTIZACION'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(color: Colors.white)))).toList(),
+                              items: ['RECIBO', 'COTIZACION'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(color: AppTheme.textColor(context))))).toList(),
                               onChanged: (val) => setState(() => _tipoDocumento = val!),
-                              dropdownColor: AppTheme.surfaceColor,
-                              decoration: const InputDecoration(labelText: 'Tipo de Documento', labelStyle: TextStyle(color: Colors.white70)),
+                              dropdownColor: AppTheme.inputColor(context),
+                              decoration: InputDecoration(labelText: 'Tipo de Documento', labelStyle: TextStyle(color: AppTheme.textMutedColor(context))),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -173,10 +174,11 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
                               children: [
                                 Expanded(child: _buildTextField(_placaCtrl, 'Placa')),
                                 const SizedBox(width: 8),
-                                ElevatedButton(
+                                ElevatedButton.icon(
                                   onPressed: _searchVehicleAndFill,
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor, padding: const EdgeInsets.symmetric(vertical: 16)),
-                                  child: const Icon(Icons.search, color: Colors.white),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor, padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16)),
+                                  icon: const Icon(Icons.search, color: Colors.black),
+                                  label: const Text('Buscar', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
@@ -221,11 +223,11 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Ítems (Servicios / Repuestos)', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('Ítems (Servicios / Repuestos)', style: TextStyle(color: AppTheme.textColor(context), fontSize: 20, fontWeight: FontWeight.bold)),
                   ElevatedButton.icon(
                     onPressed: _addItem,
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    label: const Text('Añadir Ítem', style: TextStyle(color: Colors.white)),
+                    icon: Icon(Icons.add, color: AppTheme.textColor(context)),
+                    label: Text('Añadir Ítem', style: TextStyle(color: AppTheme.textColor(context))),
                     style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
                   )
                 ],
@@ -235,7 +237,7 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
                 int idx = e.key;
                 Map<String, dynamic> item = e.value;
                 return Card(
-                  color: AppTheme.surfaceColor,
+                  color: AppTheme.cardColor(context),
                   margin: const EdgeInsets.only(bottom: 12),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
@@ -268,13 +270,13 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
   Widget _buildTextField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: AppTheme.textColor(context)),
       validator: (val) => val!.isEmpty ? 'Campo requerido' : null,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
+        labelStyle: TextStyle(color: AppTheme.textMutedColor(context)),
         filled: true,
-        fillColor: AppTheme.bg,
+        fillColor: AppTheme.inputColor(context),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
       ),
     );
@@ -283,7 +285,7 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
   Widget _buildItemField(Map<String, dynamic> item, String key, String label, TextInputType type, int idx) {
     return TextFormField(
       initialValue: item[key].toString(),
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: AppTheme.textColor(context)),
       keyboardType: type,
       onChanged: (val) {
         if (key == 'descripcion') {
@@ -294,9 +296,9 @@ class _AdminReceiptFormScreenState extends State<AdminReceiptFormScreen> {
       },
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
+        labelStyle: TextStyle(color: AppTheme.textMutedColor(context)),
         filled: true,
-        fillColor: AppTheme.bg,
+        fillColor: AppTheme.inputColor(context),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
       ),
     );

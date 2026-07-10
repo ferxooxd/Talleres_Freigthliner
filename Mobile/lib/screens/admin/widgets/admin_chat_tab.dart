@@ -62,20 +62,20 @@ class _AdminChatTabState extends State<AdminChatTab> {
                 });
               });
             },
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: AppTheme.textColor(context), fontSize: 14),
             decoration: InputDecoration(
               hintText: 'Buscar...',
-              hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
-              prefixIcon: const Icon(Icons.search, color: Colors.white54, size: 20),
+              hintStyle: TextStyle(color: AppTheme.textMutedColor(context), fontSize: 14),
+              prefixIcon: Icon(Icons.search, color: AppTheme.textMutedColor(context), size: 20),
               filled: true,
-              fillColor: const Color(0xFF171717),
+              fillColor: AppTheme.inputColor(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                borderSide: BorderSide(color: AppTheme.borderColor(context)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                borderSide: BorderSide(color: AppTheme.borderColor(context)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -87,10 +87,10 @@ class _AdminChatTabState extends State<AdminChatTab> {
         ),
         Expanded(
           child: chatUsers.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
                     'No hay usuarios disponibles',
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: AppTheme.textMutedColor(context)),
                   ),
                 )
               : ListView.builder(
@@ -112,11 +112,11 @@ class _AdminChatTabState extends State<AdminChatTab> {
                       ),
                       title: Text(
                         user.nombreCompleto,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
                         user.rol,
-                        style: const TextStyle(color: Colors.white54),
+                        style: TextStyle(color: AppTheme.textMutedColor(context)),
                       ),
                       onTap: () {
                         context.push('/chat', extra: {

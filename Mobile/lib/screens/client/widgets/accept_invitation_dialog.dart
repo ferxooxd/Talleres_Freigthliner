@@ -53,7 +53,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
     final isLoading = context.watch<VehicleProvider>().isLoading;
 
     return Dialog(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -66,7 +66,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
               Text(
                 'Aceptar Invitacion',
                 style: GoogleFonts.rajdhani(
-                  color: AppTheme.text,
+                  color: AppTheme.textColor(context),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -76,7 +76,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
               Text(
                 'Ingresa el codigo de 6 caracteres proporcionado por el propietario.',
                 style: GoogleFonts.dmSans(
-                  color: AppTheme.textMuted,
+                  color: AppTheme.textMutedColor(context),
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,
@@ -85,7 +85,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
               TextFormField(
                 controller: _codeController,
                 style: GoogleFonts.dmSans(
-                  color: AppTheme.text, 
+                  color: AppTheme.textColor(context), 
                   fontSize: 20,
                   letterSpacing: 4.0,
                   fontWeight: FontWeight.bold,
@@ -112,7 +112,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
                           onPressed: () => Navigator.of(context).pop(),
                           child: Text(
                             'Cancelar',
-                            style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                            style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -142,9 +142,9 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: GoogleFonts.dmSans(color: AppTheme.textMuted, letterSpacing: 0),
+      labelStyle: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), letterSpacing: 0),
       enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Color(0xFF333333)),
+        borderSide: BorderSide(color: AppTheme.borderColor(context)),
         borderRadius: BorderRadius.circular(8),
       ),
       focusedBorder: OutlineInputBorder(
@@ -152,7 +152,7 @@ class _AcceptInvitationDialogState extends State<AcceptInvitationDialog> {
         borderRadius: BorderRadius.circular(8),
       ),
       filled: true,
-      fillColor: const Color(0xFF242424),
+      fillColor: AppTheme.inputColor(context),
     );
   }
 }

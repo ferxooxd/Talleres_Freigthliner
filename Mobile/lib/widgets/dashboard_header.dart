@@ -20,9 +20,9 @@ class DashboardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-      decoration: const BoxDecoration(
-        color: Color(0xFF101010),
-        border: Border(bottom: BorderSide(color: Color(0xFF242424), width: 1)),
+      decoration: BoxDecoration(
+        color: AppTheme.appBarColor(context),
+        border: Border(bottom: BorderSide(color: AppTheme.borderColor(context), width: 1)),
       ),
       child: Row(
         children: [
@@ -46,7 +46,7 @@ class DashboardHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textDim,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 12,
                   ),
                 ),
@@ -136,11 +136,11 @@ class _HeaderIconButton extends StatelessWidget {
         height: 44,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: const Color(0xFF171717),
+          color: AppTheme.cardColor(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF2A2A2A)),
+          border: Border.all(color: AppTheme.borderColor(context)),
         ),
-        child: Icon(icon, color: AppTheme.textMuted, size: 22),
+        child: Icon(icon, color: AppTheme.textMutedColor(context), size: 22),
       ),
     );
   }
@@ -153,7 +153,7 @@ class _HeaderAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      color: const Color(0xFF171717),
+      color: AppTheme.cardColor(context),
       icon: Container(
         width: 46,
         height: 46,
@@ -189,9 +189,9 @@ class _HeaderAvatar extends StatelessWidget {
           value: 'profile', 
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, color: AppTheme.text, size: 20),
+              Icon(Icons.person_outline_rounded, color: AppTheme.textColor(context), size: 20),
               const SizedBox(width: 10),
-              const Text('Mi Cuenta'),
+              Text('Mi Cuenta', style: GoogleFonts.dmSans(color: AppTheme.textColor(context))),
             ],
           ),
         ),
@@ -199,9 +199,9 @@ class _HeaderAvatar extends StatelessWidget {
           value: 'privacy', 
           child: Row(
             children: [
-              Icon(Icons.privacy_tip_outlined, color: AppTheme.text, size: 20),
+              Icon(Icons.privacy_tip_outlined, color: AppTheme.textColor(context), size: 20),
               const SizedBox(width: 10),
-              const Text('Privacidad'),
+              Text('Privacidad', style: GoogleFonts.dmSans(color: AppTheme.textColor(context))),
             ],
           ),
         ),

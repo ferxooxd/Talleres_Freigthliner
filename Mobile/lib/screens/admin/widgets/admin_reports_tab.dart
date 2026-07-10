@@ -74,19 +74,19 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
         children: [
           Text(
             'Historial de Vehículos',
-            style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+            style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _searchController,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: AppTheme.textColor(context)),
             textCapitalization: TextCapitalization.characters,
             decoration: InputDecoration(
               hintText: 'Buscar por placa...',
-              hintStyle: const TextStyle(color: Colors.white54),
-              prefixIcon: const Icon(Icons.search, color: Colors.white54),
+              hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
+              prefixIcon: Icon(Icons.search, color: AppTheme.textMutedColor(context)),
               filled: true,
-              fillColor: const Color(0xFF151515),
+              fillColor: AppTheme.inputColor(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -96,20 +96,23 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           const SizedBox(height: 16),
           Expanded(
             child: vehicles.isEmpty
-                ? const Center(child: Text('No se encontraron vehículos.', style: TextStyle(color: Colors.white70)))
+                ? const Center(child: Text('No se encontraron vehículos.', style: TextStyle(color: Colors.grey)))
                 : ListView.builder(
                     itemCount: vehicles.length,
                     itemBuilder: (context, index) {
                       final v = vehicles[index];
                       return Card(
-                        color: const Color(0xFF0A0A0A),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFF242424))),
+                        color: AppTheme.cardColor(context),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: AppTheme.borderColor(context)),
+                        ),
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ListTile(
                           leading: const Icon(Icons.directions_car, color: AppTheme.amber),
-                          title: Text(v['placa']?.toString() ?? 'Sin Placa', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          subtitle: Text('${v['marca']} ${v['modelo']} - ${v['tipo_vehiculo']}', style: const TextStyle(color: Colors.white54)),
-                          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 16),
+                          title: Text(v['placa']?.toString() ?? 'Sin Placa', style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
+                          subtitle: Text('${v['marca']} ${v['modelo']} - ${v['tipo_vehiculo']}', style: TextStyle(color: AppTheme.textMutedColor(context))),
+                          trailing: Icon(Icons.arrow_forward_ios, color: AppTheme.textMutedColor(context), size: 16),
                           onTap: () => _selectVehicle(v),
                         ),
                       );
@@ -145,19 +148,19 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: Icon(Icons.arrow_back, color: AppTheme.textColor(context)),
                 onPressed: () => setState(() => _selectedVehicle = null),
               ),
               Text(
                 'Placa: ${vehiculo['placa']}',
-                style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Card(
-            color: const Color(0xFF151515),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            color: AppTheme.cardColor(context),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AppTheme.borderColor(context))),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -165,17 +168,17 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                 children: [
                   const Text('Datos del Vehículo', style: TextStyle(color: AppTheme.amber, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text('Marca: ${vehiculo['marca']}', style: const TextStyle(color: Colors.white)),
-                  Text('Modelo: ${vehiculo['modelo']}', style: const TextStyle(color: Colors.white)),
-                  Text('Tipo: ${vehiculo['tipo_vehiculo']}', style: const TextStyle(color: Colors.white)),
+                  Text('Marca: ${vehiculo['marca']}', style: TextStyle(color: AppTheme.textColor(context))),
+                  Text('Modelo: ${vehiculo['modelo']}', style: TextStyle(color: AppTheme.textColor(context))),
+                  Text('Tipo: ${vehiculo['tipo_vehiculo']}', style: TextStyle(color: AppTheme.textColor(context))),
                   if (vehiculo['propietario_nombre'] != null)
-                     Text('Propietario: ${vehiculo['propietario_nombre']}', style: const TextStyle(color: Colors.white)),
+                     Text('Propietario: ${vehiculo['propietario_nombre']}', style: TextStyle(color: AppTheme.textColor(context))),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text('Órdenes de Servicio', style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          Text('Órdenes de Servicio', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Expanded(
             child: rawOrders.isEmpty
@@ -185,9 +188,9 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                     itemBuilder: (context, index) {
                       final order = rawOrders[index];
                       return Card(
-                        color: const Color(0xFF0A0A0A),
+                        color: AppTheme.cardColor(context),
                         margin: const EdgeInsets.only(bottom: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFF242424))),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AppTheme.borderColor(context))),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -198,7 +201,7 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                                 children: [
                                   Text(
                                     order['numero_orden']?.toString() ?? 'Orden #${order['id_orden']}',
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
                                   ),
                                   Text(
                                     order['estado_orden']?.toString() ?? '',
@@ -207,19 +210,19 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Text('Fecha Ingreso: ${order['fecha_ingreso']}', style: const TextStyle(color: Colors.white70)),
+                              Text('Fecha Ingreso: ${order['fecha_ingreso']}', style: TextStyle(color: AppTheme.textMutedColor(context))),
                               if (order['fecha_salida'] != null)
-                                Text('Fecha Salida: ${order['fecha_salida']}', style: const TextStyle(color: Colors.white70)),
+                                Text('Fecha Salida: ${order['fecha_salida']}', style: TextStyle(color: AppTheme.textMutedColor(context))),
                               const SizedBox(height: 8),
-                              Text('Cliente: ${order['cliente_nombre']} (C.C: ${order['cliente_identificacion']} / Tel: ${order['cliente_telefono']})', style: const TextStyle(color: Colors.white)),
+                              Text('Cliente: ${order['cliente_nombre']} (C.C: ${order['cliente_identificacion']} / Tel: ${order['cliente_telefono']})', style: TextStyle(color: AppTheme.textColor(context))),
                               const SizedBox(height: 4),
-                              Text('Km Ingreso: ${order['kilometraje_ingreso']} | Combustible: ${order['nivel_combustible']}', style: const TextStyle(color: Colors.white70)),
+                              Text('Km Ingreso: ${order['kilometraje_ingreso']} | Combustible: ${order['nivel_combustible']}', style: TextStyle(color: AppTheme.textMutedColor(context))),
                               const SizedBox(height: 8),
-                              Text('Trabajos: ${order['trabajos_a_realizar']}', style: const TextStyle(color: Colors.white)),
+                              Text('Trabajos: ${order['trabajos_a_realizar']}', style: TextStyle(color: AppTheme.textColor(context))),
                               if (order['informe_trabajo'] != null)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text('Informe: ${order['informe_trabajo']}', style: const TextStyle(color: Colors.white54)),
+                                  child: Text('Informe: ${order['informe_trabajo']}', style: TextStyle(color: AppTheme.textMutedColor(context))),
                                 ),
                               const SizedBox(height: 12),
                               Align(
@@ -242,7 +245,7 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   ),
           ),
           const SizedBox(height: 16),
-          Text('Recibos y Cotizaciones', style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          Text('Recibos y Cotizaciones', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Expanded(
             child: vehicleReceipts.isEmpty
@@ -253,13 +256,13 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                       final receipt = vehicleReceipts[index];
                       final isFinalizado = receipt['estado'] == 'FINALIZADO';
                       return Card(
-                        color: const Color(0xFF0A0A0A),
+                        color: AppTheme.cardColor(context),
                         margin: const EdgeInsets.only(bottom: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFF242424))),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AppTheme.borderColor(context))),
                         child: ListTile(
                           leading: Icon(isFinalizado ? Icons.check_circle : Icons.edit_document, color: isFinalizado ? Colors.green : Colors.orange),
-                          title: Text('${receipt['tipo_documento']} ${receipt['numero_recibo']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          subtitle: Text('Total: ${formatCurrency.format(receipt['total'])}', style: const TextStyle(color: Colors.white54)),
+                          title: Text('${receipt['tipo_documento']} ${receipt['numero_recibo']}', style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
+                          subtitle: Text('Total: ${formatCurrency.format(receipt['total'])}', style: TextStyle(color: AppTheme.textMutedColor(context))),
                           trailing: isFinalizado 
                               ? IconButton(
                                   icon: const Icon(Icons.picture_as_pdf, color: Colors.redAccent),

@@ -47,13 +47,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                   children: [
                     Expanded(
                       child: TextField(
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppTheme.textColor(context)),
                         decoration: InputDecoration(
                           hintText: 'Buscar por nombre, correo o cédula...',
-                          hintStyle: const TextStyle(color: Colors.white54),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                          hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
+                          prefixIcon: Icon(Icons.search, color: AppTheme.textMutedColor(context)),
                           filled: true,
-                          fillColor: AppTheme.surfaceColor,
+                          fillColor: AppTheme.inputColor(context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -68,8 +68,8 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     ),
                     const SizedBox(width: 16),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.person_add, color: Colors.white),
-                      label: const Text('Añadir Mecánico', style: TextStyle(color: Colors.white)),
+                      icon: const Icon(Icons.person_add, color: Colors.black),
+                      label: const Text('Añadir Mecánico', style: TextStyle(color: Colors.black)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -89,7 +89,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     final isAdmin = user.rol == 'Admin';
                     
                     return Card(
-                      color: AppTheme.surfaceColor,
+                      color: AppTheme.cardColor(context),
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ListTile(
                         leading: CircleAvatar(
@@ -103,11 +103,11 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         ),
                         title: Text(
                           user.nombreCompleto,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
                           '${user.correoElectronico}\nC.C: ${user.cedula} | Rol: ${user.rol}',
-                          style: const TextStyle(color: Colors.white54),
+                          style: TextStyle(color: AppTheme.textMutedColor(context)),
                         ),
                         isThreeLine: true,
                         trailing: Row(
@@ -145,26 +145,26 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.bg,
-        title: const Text('Editar Usuario', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Editar Usuario', style: TextStyle(color: AppTheme.textColor(context))),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildTextField(nombreCtrl, 'Nombre'),
+              _buildTextField(context, nombreCtrl, 'Nombre'),
               const SizedBox(height: 12),
-              _buildTextField(apellidoCtrl, 'Apellido'),
+              _buildTextField(context, apellidoCtrl, 'Apellido'),
               const SizedBox(height: 12),
-              _buildTextField(telefonoCtrl, 'Teléfono'),
+              _buildTextField(context, telefonoCtrl, 'Teléfono'),
               const SizedBox(height: 12),
-              _buildTextField(cedulaCtrl, 'Cédula'),
+              _buildTextField(context, cedulaCtrl, 'Cédula'),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
@@ -182,7 +182,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.errorColor));
               }
             },
-            child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+            child: const Text('Guardar', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -201,32 +201,32 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.bg,
-        title: const Text('Añadir Mecánico', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Añadir Mecánico', style: TextStyle(color: AppTheme.textColor(context))),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildTextField(nombreCtrl, 'Nombre'),
+              _buildTextField(context, nombreCtrl, 'Nombre'),
               const SizedBox(height: 12),
-              _buildTextField(apellidoCtrl, 'Apellido'),
+              _buildTextField(context, apellidoCtrl, 'Apellido'),
               const SizedBox(height: 12),
-              _buildTextField(telefonoCtrl, 'Teléfono'),
+              _buildTextField(context, telefonoCtrl, 'Teléfono'),
               const SizedBox(height: 12),
-              _buildTextField(cedulaCtrl, 'Cédula'),
+              _buildTextField(context, cedulaCtrl, 'Cédula'),
               const SizedBox(height: 12),
-              _buildTextField(correoCtrl, 'Correo', isEmail: true),
+              _buildTextField(context, correoCtrl, 'Correo', isEmail: true),
               const SizedBox(height: 12),
-              _buildTextField(passCtrl, 'Contraseña', obscure: true),
+              _buildTextField(context, passCtrl, 'Contraseña', obscure: true),
               const SizedBox(height: 12),
-              _buildTextField(espCtrl, 'Especialidad (Opcional)'),
+              _buildTextField(context, espCtrl, 'Especialidad (Opcional)'),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
@@ -248,24 +248,24 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.errorColor));
               }
             },
-            child: const Text('Crear', style: TextStyle(color: Colors.white)),
+            child: const Text('Crear', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, {bool obscure = false, bool isEmail = false}) {
+  Widget _buildTextField(BuildContext context, TextEditingController controller, String label, {bool obscure = false, bool isEmail = false}) {
     return TextField(
       controller: controller,
       obscureText: obscure,
       keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: AppTheme.textColor(context)),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
+        labelStyle: TextStyle(color: AppTheme.textMutedColor(context)),
         filled: true,
-        fillColor: AppTheme.surfaceColor,
+        fillColor: AppTheme.inputColor(context),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
       ),
     );
@@ -275,16 +275,16 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.surfaceColor,
-        title: const Text('Eliminar Usuario', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Eliminar Usuario', style: TextStyle(color: AppTheme.textColor(context))),
         content: Text(
           '¿Estás seguro de que deseas eliminar al usuario $nombre? Esta acción no se puede deshacer.',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppTheme.textMutedColor(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),

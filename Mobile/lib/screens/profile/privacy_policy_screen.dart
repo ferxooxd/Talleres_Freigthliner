@@ -10,18 +10,18 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF050607),
+      backgroundColor: AppTheme.bgColor(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.text),
+          icon: Icon(Icons.arrow_back_rounded, color: AppTheme.textColor(context)),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'Políticas y Privacidad',
           style: GoogleFonts.rajdhani(
-            color: AppTheme.text,
+            color: AppTheme.textColor(context),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -50,7 +50,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             Text(
               'TF Centro Automotriz',
               style: GoogleFonts.rajdhani(
-                color: AppTheme.text,
+                color: AppTheme.textColor(context),
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
               ),
@@ -59,31 +59,31 @@ class PrivacyPolicyScreen extends StatelessWidget {
             Text(
               'A continuación, presentamos los términos, condiciones y políticas de uso de nuestra plataforma y servicios en el taller.',
               style: GoogleFonts.dmSans(
-                color: AppTheme.textMuted,
+                color: AppTheme.textMutedColor(context),
                 fontSize: 14,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            _buildPolicySection(
+            _buildPolicySection(context,
               title: '1. Uso de Información Personal',
               icon: Icons.contact_page_outlined,
               content:
                   'Los datos proporcionados (nombre, teléfono, placa, modelo del vehículo) serán utilizados de forma exclusiva para la gestión de citas, el historial de mantenimientos y la facturación. No compartiremos su información con terceros sin su consentimiento explícito.',
             ),
-            _buildPolicySection(
+            _buildPolicySection(context,
               title: '2. Condiciones de Agendamiento',
               icon: Icons.calendar_month_outlined,
               content:
                   'Las citas programadas deben ser respetadas en horario. Si requiere reprogramar o cancelar una cita, deberá hacerlo con un mínimo de 3 horas de anticipación. Pasado este tiempo, el sistema bloqueará la opción para garantizar la eficiencia de nuestro taller.',
             ),
-            _buildPolicySection(
+            _buildPolicySection(context,
               title: '3. Responsabilidad sobre Objetos',
               icon: Icons.no_luggage_outlined,
               content:
                   'Solicitamos amablemente retirar objetos de valor del vehículo al ingresarlo al taller. TF Centro Automotriz no se hace responsable por la pérdida de artículos personales no declarados durante el inventario de recepción.',
             ),
-            _buildPolicySection(
+            _buildPolicySection(context,
               title: '4. Garantía de Servicio',
               icon: Icons.verified_outlined,
               content:
@@ -94,7 +94,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               child: Text(
                 'Última actualización: Noviembre 2023',
                 style: GoogleFonts.dmSans(
-                  color: AppTheme.textDim,
+                  color: AppTheme.textMutedColor(context),
                   fontSize: 12,
                 ),
               ),
@@ -106,7 +106,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPolicySection({
+  Widget _buildPolicySection(BuildContext context, {
     required String title,
     required IconData icon,
     required String content,
@@ -116,9 +116,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF101010),
+          color: AppTheme.cardColor(context),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF242424)),
+          border: Border.all(color: AppTheme.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +131,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   child: Text(
                     title,
                     style: GoogleFonts.rajdhani(
-                      color: AppTheme.text,
+                      color: AppTheme.textColor(context),
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -143,7 +143,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             Text(
               content,
               style: GoogleFonts.dmSans(
-                color: AppTheme.textMuted,
+                color: AppTheme.textMutedColor(context),
                 fontSize: 14,
                 height: 1.5,
               ),

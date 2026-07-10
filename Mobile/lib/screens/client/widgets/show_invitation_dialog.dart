@@ -63,7 +63,7 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -74,7 +74,7 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
             Text(
               'Codigo de Invitacion',
               style: GoogleFonts.rajdhani(
-                color: AppTheme.text,
+                color: AppTheme.textColor(context),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -84,7 +84,7 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
             Text(
               'Comparte este codigo con el conductor que deseas asignar a la placa ${widget.placa}.',
               style: GoogleFonts.dmSans(
-                color: AppTheme.textMuted,
+                color: AppTheme.textMutedColor(context),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -105,9 +105,9 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF242424),
+                  color: AppTheme.inputColor(context),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF333333)),
+                  border: Border.all(color: AppTheme.borderColor(context)),
                 ),
                 child: Center(
                   child: Text(
@@ -148,7 +148,7 @@ class _ShowInvitationDialogState extends State<ShowInvitationDialog> {
               child: Text(
                 'Cerrar',
                 style: GoogleFonts.dmSans(
-                    color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                    color: AppTheme.textMutedColor(context), fontWeight: FontWeight.bold),
               ),
             ),
           ],

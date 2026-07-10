@@ -21,7 +21,7 @@ class MechanicReportsTab extends StatelessWidget {
               Text(
                 'Resumen Semanal',
                 style: GoogleFonts.rajdhani(
-                  color: AppTheme.text,
+                  color: AppTheme.textColor(context),
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -74,9 +74,9 @@ class _StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161616),
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF262626)),
+        border: Border.all(color: AppTheme.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +86,7 @@ class _StatBox extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.rajdhani(
-              color: AppTheme.text,
+              color: AppTheme.textColor(context),
               fontSize: 28,
               fontWeight: FontWeight.w800,
             ),
@@ -94,7 +94,7 @@ class _StatBox extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.dmSans(
-              color: AppTheme.textMuted,
+              color: AppTheme.textMutedColor(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),

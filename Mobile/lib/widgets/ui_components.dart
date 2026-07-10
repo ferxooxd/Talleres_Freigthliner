@@ -30,7 +30,7 @@ class TabScaffold extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.rajdhani(
-                      color: AppTheme.text,
+                      color: AppTheme.textColor(context),
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -66,9 +66,9 @@ class DashboardCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: const Color(0xFF101010),
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF262626), width: 1),
+        border: Border.all(color: AppTheme.borderColor(context), width: 1),
       ),
       child: child,
     );
@@ -113,7 +113,7 @@ class CardTitle extends StatelessWidget {
           child: Text(
             title,
             style: GoogleFonts.rajdhani(
-              color: AppTheme.text,
+              color: AppTheme.textColor(context),
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
@@ -136,7 +136,7 @@ class PriceRow extends StatelessWidget {
   final bool isTotal;
   @override
   Widget build(BuildContext context) {
-    final color = isTotal ? AppTheme.green : AppTheme.text;
+    final color = isTotal ? AppTheme.green : AppTheme.textColor(context);
     final size = isTotal ? 20.0 : 16.0;
     return Row(
       children: [
@@ -144,7 +144,7 @@ class PriceRow extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.dmSans(
-              color: AppTheme.text,
+              color: AppTheme.textColor(context),
               fontSize: size,
               fontWeight: FontWeight.w800,
             ),
@@ -175,14 +175,14 @@ class InfoLine extends StatelessWidget {
           width: 78,
           child: Text(
             label,
-            style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+            style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
           ),
         ),
         Expanded(
           child: Text(
             value,
             style: GoogleFonts.dmSans(
-              color: AppTheme.text,
+              color: AppTheme.textColor(context),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -237,17 +237,17 @@ class ActionButton extends StatelessWidget {
         ? AppTheme.green
         : isDanger
         ? AppTheme.red.withValues(alpha: 0.18)
-        : const Color(0xFF111111);
+        : AppTheme.cardColor(context);
     final foreground = isPrimary
         ? Colors.black
         : isDanger
         ? const Color(0xFFFF6B6B)
-        : AppTheme.textMuted;
+        : AppTheme.textColor(context);
     final borderColor = isPrimary
         ? AppTheme.green
         : isDanger
         ? AppTheme.red.withValues(alpha: 0.55)
-        : const Color(0xFF2A2A2A);
+        : AppTheme.borderColor(context);
     return ElevatedButton.icon(
       onPressed: onPressed ?? () {},
       icon: Icon(icon, size: 17),

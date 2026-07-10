@@ -52,7 +52,7 @@ class _SupportNoteCard extends StatelessWidget {
           Text(
             'Tus comentarios ayudan al equipo a mejorar cada entrega. Cuéntanos tu experiencia.',
             style: GoogleFonts.dmSans(
-              color: AppTheme.textMuted,
+              color: AppTheme.textMutedColor(context),
               fontSize: 15,
               height: 1.45,
             ),
@@ -100,7 +100,7 @@ class _CommentListCard extends StatelessWidget {
               if (commentProvider.comments.isEmpty) {
                 return Text(
                   'No hay comentarios todavía.',
-                  style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                 );
               }
 
@@ -109,7 +109,7 @@ class _CommentListCard extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: commentProvider.comments.length,
                 separatorBuilder: (context, index) =>
-                    const Divider(color: Color(0xFF2A2A2A)),
+                    Divider(color: AppTheme.borderColor(context)),
                 itemBuilder: (context, index) {
                   final comment = commentProvider.comments[index];
                   final isOwner = comment.idUsuario == authProvider.userId;
@@ -127,7 +127,7 @@ class _CommentListCard extends StatelessWidget {
                                 Text(
                                   comment.usuario.nombre,
                                   style: GoogleFonts.dmSans(
-                                    color: AppTheme.text,
+                                    color: AppTheme.textColor(context),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -139,7 +139,7 @@ class _CommentListCard extends StatelessWidget {
                                       Icons.star_rounded,
                                       color: starIndex < comment.rating
                                           ? AppTheme.green
-                                          : AppTheme.textDim,
+                                          : AppTheme.textMutedColor(context),
                                       size: 16,
                                     ),
                                   ),
@@ -150,9 +150,9 @@ class _CommentListCard extends StatelessWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.edit_rounded,
-                                      color: AppTheme.textMuted,
+                                      color: AppTheme.textMutedColor(context),
                                       size: 20,
                                     ),
                                     onPressed: () {
@@ -177,7 +177,7 @@ class _CommentListCard extends StatelessWidget {
                         Text(
                           comment.comentario,
                           style: GoogleFonts.dmSans(
-                            color: AppTheme.text,
+                            color: AppTheme.textColor(context),
                             fontSize: 15,
                           ),
                         ),
@@ -261,10 +261,10 @@ class _CommentDialogState extends State<_CommentDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF171717),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF2A2A2A)),
+        side: BorderSide(color: AppTheme.borderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -275,7 +275,7 @@ class _CommentDialogState extends State<_CommentDialog> {
             Text(
               widget.comment == null ? 'Nuevo comentario' : 'Editar comentario',
               style: GoogleFonts.dmSans(
-                color: AppTheme.text,
+                color: AppTheme.textColor(context),
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -294,7 +294,7 @@ class _CommentDialogState extends State<_CommentDialog> {
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
                       Icons.star_rounded,
-                      color: index < _rating ? AppTheme.green : AppTheme.textDim,
+                      color: index < _rating ? AppTheme.green : AppTheme.textMutedColor(context),
                       size: 32,
                     ),
                   ),
@@ -304,16 +304,16 @@ class _CommentDialogState extends State<_CommentDialog> {
             const SizedBox(height: 20),
             TextField(
               controller: _controller,
-              style: GoogleFonts.dmSans(color: AppTheme.text),
+              style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Escribe tu comentario...',
-                hintStyle: GoogleFonts.dmSans(color: AppTheme.textDim),
+                hintStyle: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                 filled: true,
-                fillColor: const Color(0xFF0A0A0A),
+                fillColor: AppTheme.inputColor(context),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                  borderSide: BorderSide(color: AppTheme.borderColor(context)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -329,7 +329,7 @@ class _CommentDialogState extends State<_CommentDialog> {
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     'Cancelar',
-                    style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                    style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -375,22 +375,22 @@ void _showDeleteConfirmation(BuildContext context, int idComentario) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: const Color(0xFF171717),
+        backgroundColor: AppTheme.cardColor(context),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFF2A2A2A)),
+          side: BorderSide(color: AppTheme.borderColor(context)),
         ),
         title: Text(
           'Eliminar comentario',
           style: GoogleFonts.dmSans(
-            color: AppTheme.text,
+            color: AppTheme.textColor(context),
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           '¿Estás seguro de que deseas eliminar este comentario?',
           style: GoogleFonts.dmSans(
-            color: AppTheme.textMuted,
+            color: AppTheme.textMutedColor(context),
           ),
         ),
         actions: [
@@ -398,7 +398,7 @@ void _showDeleteConfirmation(BuildContext context, int idComentario) {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancelar',
-              style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+              style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
             ),
           ),
           Consumer<CommentProvider>(

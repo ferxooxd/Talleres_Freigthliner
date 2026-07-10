@@ -51,13 +51,13 @@ class _AdminReceiptsTabState extends State<AdminReceiptsTab> {
                     children: [
                       Expanded(
                         child: TextField(
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppTheme.textColor(context)),
                           decoration: InputDecoration(
                             hintText: 'Buscar por N° Recibo, Placa o Cliente...',
-                            hintStyle: const TextStyle(color: Colors.white54),
-                            prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                            hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
+                            prefixIcon: Icon(Icons.search, color: AppTheme.textMutedColor(context)),
                             filled: true,
-                            fillColor: AppTheme.surfaceColor,
+                            fillColor: AppTheme.inputColor(context),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -89,22 +89,22 @@ class _AdminReceiptsTabState extends State<AdminReceiptsTab> {
                       final formatCurrency = NumberFormat.currency(locale: 'es_CO', symbol: '\$');
 
                       return Card(
-                        color: AppTheme.surfaceColor,
+                        color: AppTheme.cardColor(context),
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ExpansionTile(
-                          iconColor: Colors.white,
-                          collapsedIconColor: Colors.white54,
+                          iconColor: AppTheme.textColor(context),
+                          collapsedIconColor: AppTheme.textMutedColor(context),
                           leading: CircleAvatar(
                             backgroundColor: isFinalizado ? Colors.green : Colors.orange,
                             child: Icon(isFinalizado ? Icons.check_circle : Icons.edit_document, color: Colors.white),
                           ),
                           title: Text(
                             '${receipt['tipo_documento']} ${receipt['numero_recibo']}',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             'Cliente: ${receipt['cliente_nombre']} | Placa: ${receipt['placa']}\nTotal: ${formatCurrency.format(receipt['total'])}',
-                            style: const TextStyle(color: Colors.white54),
+                            style: TextStyle(color: AppTheme.textMutedColor(context)),
                           ),
                           children: [
                             Padding(
@@ -171,16 +171,16 @@ class _AdminReceiptsTabState extends State<AdminReceiptsTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.surfaceColor,
-        title: const Text('Finalizar Documento', style: TextStyle(color: Colors.white)),
-        content: const Text(
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Finalizar Documento', style: TextStyle(color: AppTheme.textColor(context))),
+        content: Text(
           '¿Estás seguro de finalizar este documento? Una vez finalizado no podrá ser editado ni eliminado, y se podrá descargar en PDF.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppTheme.textMutedColor(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -204,16 +204,16 @@ class _AdminReceiptsTabState extends State<AdminReceiptsTab> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.surfaceColor,
-        title: const Text('Eliminar Documento', style: TextStyle(color: Colors.white)),
-        content: const Text(
+        backgroundColor: AppTheme.cardColor(context),
+        title: Text('Eliminar Documento', style: TextStyle(color: AppTheme.textColor(context))),
+        content: Text(
           '¿Estás seguro de eliminar este documento?',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppTheme.textMutedColor(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),

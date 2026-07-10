@@ -201,11 +201,14 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: const Color(0xFF101010),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      insetPadding: const EdgeInsets.all(16),
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: AppTheme.bgColor(context),
+      appBar: AppBar(
+        title: Text('Generar Orden de Servicio', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
+        backgroundColor: AppTheme.bgColor(context),
+        foregroundColor: AppTheme.textColor(context),
+      ),
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Form(
@@ -214,15 +217,14 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Generar Orden de Servicio', style: GoogleFonts.rajdhani(color: AppTheme.green, fontSize: 22, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 16),
                 
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF151515),
+                    color: AppTheme.cardColor(context),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF242424)),
+                    border: Border.all(color: AppTheme.borderColor(context)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +264,7 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                         ),
                       const SizedBox(height: 16),
                       SwitchListTile(
-                        title: Text('¿Vincular con cita agendada?', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold)),
+                        title: Text('¿Vincular con cita agendada?', style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
                         value: _hasBooking,
                         activeColor: AppTheme.green,
                         onChanged: widget.booking != null ? null : (val) {
@@ -275,8 +277,8 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                         const SizedBox(height: 8),
                         DropdownButtonFormField<BookingModel>(
                           value: _selectedBooking,
-                          dropdownColor: const Color(0xFF151515),
-                          style: const TextStyle(color: Colors.white),
+                          dropdownColor: AppTheme.inputColor(context),
+                          style: TextStyle(color: AppTheme.textColor(context)),
                           decoration: const InputDecoration(
                             labelText: 'Seleccionar Cita Confirmada',
                             border: OutlineInputBorder(),
@@ -302,9 +304,9 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                     ],
                   ),
                 ),
-                const Divider(color: Color(0xFF242424), height: 32),
+                Divider(color: AppTheme.borderColor(context), height: 32),
                 
-                Text('Datos del Cliente', style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Datos del Cliente', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 _buildTextField(controller: _clienteNombreController, label: 'Nombre Cliente', icon: Icons.person, validator: (v) => v == null || v.isEmpty ? 'Requerido' : null),
                 const SizedBox(height: 12),
@@ -321,9 +323,9 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                   ],
                 ),
                 
-                const Divider(color: Color(0xFF242424), height: 32),
+                Divider(color: AppTheme.borderColor(context), height: 32),
                 
-                Text('Datos del Ingreso', style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Datos del Ingreso', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -334,9 +336,9 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(controller: _trabajosController, label: 'Diagnóstico o Trabajos a Realizar', icon: Icons.build_rounded, maxLines: 3, validator: (v) => v == null || v.isEmpty ? 'Requerido' : null),
-                const Divider(color: Color(0xFF242424), height: 32),
+                Divider(color: AppTheme.borderColor(context), height: 32),
 
-                Text('Conductor (Opcional)', style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Conductor (Opcional)', style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 _buildTextField(controller: _conductorNombreController, label: 'Nombre del Conductor', icon: Icons.person_outline),
                 const SizedBox(height: 12),
@@ -348,7 +350,7 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Color(0xFF333333)), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                        style: OutlinedButton.styleFrom(foregroundColor: AppTheme.textColor(context), side: BorderSide(color: AppTheme.borderColor(context)), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                         child: const Text('Cancelar'),
                       ),
                     ),
@@ -384,10 +386,10 @@ class _ServiceOrderFormDialogState extends State<ServiceOrderFormDialog> {
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: GoogleFonts.dmSans(color: Colors.white, fontSize: 14),
+      style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: maxLines == 1 ? Icon(icon, color: AppTheme.textDim, size: 20) : null,
+        prefixIcon: maxLines == 1 ? Icon(icon, color: AppTheme.textMutedColor(context), size: 20) : null,
         alignLabelWithHint: maxLines > 1,
         border: const OutlineInputBorder(),
       ),

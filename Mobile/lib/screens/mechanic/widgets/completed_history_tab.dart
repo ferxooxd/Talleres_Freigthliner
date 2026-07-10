@@ -29,7 +29,7 @@ class CompletedHistoryTab extends StatelessWidget {
                   Text(
                     'Historial de Trabajos',
                     style: GoogleFonts.rajdhani(
-                      color: AppTheme.text,
+                      color: AppTheme.textColor(context),
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -44,7 +44,7 @@ class CompletedHistoryTab extends StatelessWidget {
                   }
                   
                   if (provider.completedOrders.isEmpty) {
-                    return const Text('No tienes trabajos completados.', style: TextStyle(color: Colors.white70));
+                    return Text('No tienes trabajos completados.', style: TextStyle(color: AppTheme.textMutedColor(context)));
                   }
 
                   return Column(
@@ -87,9 +87,9 @@ class _CompletedHistoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF101010),
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF262626), width: 1),
+        border: Border.all(color: AppTheme.borderColor(context), width: 1),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -118,7 +118,7 @@ class _CompletedHistoryCard extends StatelessWidget {
                     Text(
                       vehicle,
                       style: GoogleFonts.rajdhani(
-                        color: AppTheme.text,
+                        color: AppTheme.textColor(context),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -126,7 +126,7 @@ class _CompletedHistoryCard extends StatelessWidget {
                     Text(
                       'Placa: $plate',
                       style: GoogleFonts.dmSans(
-                        color: AppTheme.textMuted,
+                        color: AppTheme.textMutedColor(context),
                         fontSize: 13,
                       ),
                     ),
@@ -171,19 +171,19 @@ class _CompletedHistoryCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF151515),
+                    color: AppTheme.cardColor(context),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF333333)),
+                    border: Border.all(color: AppTheme.borderColor(context)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Mi Informe Técnico', style: GoogleFonts.dmSans(color: AppTheme.green, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
-                      Text(displayText, style: GoogleFonts.dmSans(color: Colors.white, fontSize: 13)),
+                      Text(displayText, style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontSize: 13)),
                       if (imageUrls.isNotEmpty) ...[
                         const SizedBox(height: 12),
-                        Text('Evidencia:', style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 12)),
+                        Text('Evidencia:', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12)),
                         const SizedBox(height: 8),
                         SizedBox(
                           height: 70,
@@ -216,8 +216,8 @@ class _CompletedHistoryCard extends StatelessWidget {
                                     errorBuilder: (_, __, ___) => Container(
                                       width: 70,
                                       height: 70,
-                                      color: const Color(0xFF222222),
-                                      child: const Icon(Icons.broken_image, color: Colors.white38),
+                                      color: AppTheme.inputColor(context),
+                                      child: const Icon(Icons.broken_image, color: Colors.grey),
                                     ),
                                   ),
                                 ),

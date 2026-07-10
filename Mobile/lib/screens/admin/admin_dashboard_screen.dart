@@ -32,7 +32,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final initials = context.watch<AuthProvider>().initials;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF050607),
+      backgroundColor: AppTheme.bgColor(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -91,10 +91,10 @@ class _AdminBottomNav extends StatelessWidget {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        decoration: const BoxDecoration(
-          color: Color(0xFF101010),
+        decoration: BoxDecoration(
+          color: AppTheme.navBarColor(context),
           border: Border(
-            top: BorderSide(color: Color(0xFF242424), width: 1),
+            top: BorderSide(color: AppTheme.borderColor(context), width: 1),
           ),
         ),
         child: Row(
@@ -122,7 +122,7 @@ class _AdminBottomNav extends StatelessWidget {
                     children: [
                       Icon(
                         item.icon,
-                        color: selected ? AppTheme.green : AppTheme.textMuted,
+                        color: selected ? AppTheme.green : AppTheme.textMutedColor(context),
                         size: 23,
                       ),
                       const SizedBox(height: 4),
@@ -133,7 +133,7 @@ class _AdminBottomNav extends StatelessWidget {
                           maxLines: 1,
                           style: GoogleFonts.dmSans(
                             color:
-                                selected ? AppTheme.green : AppTheme.textMuted,
+                                selected ? AppTheme.green : AppTheme.textMutedColor(context),
                             fontSize: 12,
                             fontWeight:
                                 selected ? FontWeight.w800 : FontWeight.w600,

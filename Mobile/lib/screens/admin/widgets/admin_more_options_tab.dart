@@ -50,7 +50,7 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
                 Text(
                   _subTabTitles[_activeSubTabIndex!],
                   style: GoogleFonts.rajdhani(
-                    color: AppTheme.text,
+                    color: AppTheme.textColor(context),
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
@@ -76,7 +76,7 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
               Text(
                 'Más Opciones',
                 style: GoogleFonts.rajdhani(
-                  color: AppTheme.text,
+                  color: AppTheme.textColor(context),
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                 ),
@@ -91,10 +91,10 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
             crossAxisSpacing: 14,
             mainAxisSpacing: 14,
             children: [
-              _buildMenuCard(0, Icons.dashboard_rounded, 'Resumen General', AppTheme.blue),
-              _buildMenuCard(1, Icons.people_rounded, 'Usuarios', Colors.purple),
-              _buildMenuCard(2, Icons.receipt_long_rounded, 'Recibos', const Color(0xFF06b6d4)),
-              _buildMenuCard(3, Icons.history_rounded, 'Historial', AppTheme.amber),
+              _buildMenuCard(context, 0, Icons.dashboard_rounded, 'Resumen General', AppTheme.blue),
+              _buildMenuCard(context, 1, Icons.people_rounded, 'Usuarios', Colors.purple),
+              _buildMenuCard(context, 2, Icons.receipt_long_rounded, 'Recibos', const Color(0xFF06b6d4)),
+              _buildMenuCard(context, 3, Icons.history_rounded, 'Historial', AppTheme.amber),
             ],
           ),
         ],
@@ -102,15 +102,15 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
     );
   }
 
-  Widget _buildMenuCard(int index, IconData icon, String title, Color color) {
+  Widget _buildMenuCard(BuildContext context, int index, IconData icon, String title, Color color) {
     return InkWell(
       onTap: () => setState(() => _activeSubTabIndex = index),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0A0A0A),
+          color: AppTheme.cardColor(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.25), width: 1),
+          border: Border.all(color: AppTheme.borderColor(context), width: 1),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -121,9 +121,9 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
               height: 50,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: color.withOpacity(0.3)),
+                border: Border.all(color: color.withValues(alpha: 0.3)),
               ),
               child: Icon(icon, size: 28, color: color),
             ),
@@ -132,7 +132,7 @@ class _AdminMoreOptionsTabState extends State<AdminMoreOptionsTab> {
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.dmSans(
-                color: AppTheme.text,
+                color: AppTheme.textColor(context),
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),

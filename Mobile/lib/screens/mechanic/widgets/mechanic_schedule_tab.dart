@@ -27,7 +27,7 @@ class MechanicScheduleTab extends StatelessWidget {
                   Text(
                     'Mi Agenda',
                     style: GoogleFonts.rajdhani(
-                      color: AppTheme.text,
+                      color: AppTheme.textColor(context),
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -41,9 +41,9 @@ class MechanicScheduleTab extends StatelessWidget {
                 builder: (context, provider, child) {
                   final orders = provider.assignedOrders;
                   if (orders.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text('No tienes órdenes agendadas.', style: TextStyle(color: Colors.white70)),
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Text('No tienes órdenes agendadas.', style: TextStyle(color: AppTheme.textMutedColor(context))),
                     );
                   }
 
@@ -115,9 +115,9 @@ class _ScheduleItemCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF101010),
+        color: AppTheme.cardColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF262626), width: 1),
+        border: Border.all(color: AppTheme.borderColor(context), width: 1),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -127,9 +127,9 @@ class _ScheduleItemCard extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFF161616),
+              color: AppTheme.inputColor(context),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF262626)),
+              border: Border.all(color: AppTheme.borderColor(context)),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +145,7 @@ class _ScheduleItemCard extends StatelessWidget {
                 Text(
                   month,
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textMuted,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                   ),
@@ -161,7 +161,7 @@ class _ScheduleItemCard extends StatelessWidget {
                 Text(
                   '$time - $service',
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.text,
+                    color: AppTheme.textColor(context),
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -170,7 +170,7 @@ class _ScheduleItemCard extends StatelessWidget {
                 Text(
                   vehicle,
                   style: GoogleFonts.dmSans(
-                    color: AppTheme.textMuted,
+                    color: AppTheme.textMutedColor(context),
                     fontSize: 13,
                   ),
                 ),

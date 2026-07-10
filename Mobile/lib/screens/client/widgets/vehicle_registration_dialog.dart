@@ -62,7 +62,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: const Color(0xFF171717),
+              backgroundColor: AppTheme.cardColor(context),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Row(
                 children: [
@@ -71,14 +71,14 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
                   Expanded(
                     child: Text(
                       'Vehículo ya registrado',
-                      style: GoogleFonts.rajdhani(color: AppTheme.text, fontWeight: FontWeight.bold, fontSize: 20),
+                      style: GoogleFonts.rajdhani(color: AppTheme.textColor(context), fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                   ),
                 ],
               ),
               content: Text(
                 errorMsg,
-                style: GoogleFonts.dmSans(color: AppTheme.textMuted, fontSize: 15),
+                style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 15),
               ),
               actions: [
                 TextButton(
@@ -105,7 +105,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
     final isLoading = context.watch<VehicleProvider>().isLoading;
 
     return Dialog(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppTheme.cardColor(context),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -118,7 +118,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               Text(
                 'Registrar Vehiculo',
                 style: GoogleFonts.rajdhani(
-                  color: AppTheme.text,
+                  color: AppTheme.textColor(context),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -127,7 +127,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               const SizedBox(height: 20),
               TextFormField(
                 controller: _placaController,
-                style: GoogleFonts.dmSans(color: AppTheme.text),
+                style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                 decoration: _inputDecoration('Placa'),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Requerido' : null,
@@ -135,7 +135,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _marcaController,
-                style: GoogleFonts.dmSans(color: AppTheme.text),
+                style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                 decoration: _inputDecoration('Marca'),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Requerido' : null,
@@ -143,7 +143,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _modeloController,
-                style: GoogleFonts.dmSans(color: AppTheme.text),
+                style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
                 decoration: _inputDecoration('Modelo (Año)'),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Requerido' : null,
@@ -151,8 +151,8 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _selectedTipoVehiculo,
-                style: GoogleFonts.dmSans(color: AppTheme.text),
-                dropdownColor: const Color(0xFF242424),
+                style: GoogleFonts.dmSans(color: AppTheme.textColor(context)),
+                dropdownColor: AppTheme.inputColor(context),
                 decoration: _inputDecoration('Tipo de Vehiculo'),
                 items: _tipos.map((tipo) {
                   return DropdownMenuItem(
@@ -177,7 +177,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
                           onPressed: () => Navigator.of(context).pop(),
                           child: Text(
                             'Cancelar',
-                            style: GoogleFonts.dmSans(color: AppTheme.textMuted),
+                            style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -207,9 +207,9 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: GoogleFonts.dmSans(color: AppTheme.textMuted),
+      labelStyle: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context)),
       enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Color(0xFF333333)),
+        borderSide: BorderSide(color: AppTheme.borderColor(context)),
         borderRadius: BorderRadius.circular(8),
       ),
       focusedBorder: OutlineInputBorder(
@@ -217,7 +217,7 @@ class _VehicleRegistrationDialogState extends State<VehicleRegistrationDialog> {
         borderRadius: BorderRadius.circular(8),
       ),
       filled: true,
-      fillColor: const Color(0xFF242424),
+      fillColor: AppTheme.inputColor(context),
     );
   }
 }

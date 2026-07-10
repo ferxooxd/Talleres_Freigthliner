@@ -35,7 +35,7 @@ class CustomTextField extends StatelessWidget {
         Text(
           label,
           style: GoogleFonts.dmSans(
-            color: AppTheme.textMuted,
+            color: AppTheme.textMutedColor(context),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -49,7 +49,7 @@ class CustomTextField extends StatelessWidget {
           maxLines: maxLines,
           validator: validator,
           style: GoogleFonts.dmSans(
-            color: AppTheme.text,
+            color: AppTheme.textColor(context),
             fontSize: 13,
           ),
           decoration: InputDecoration(
