@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../repositories/auth_repository.dart';
 import '../core/storage/secure_storage.dart';
+import '../models/user_role.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _repository = AuthRepository();
@@ -27,18 +28,16 @@ class AuthProvider extends ChangeNotifier {
   String? get userName => _userName;
   String? get userLastName => _userLastName;
   bool get isAuthenticated => _token != null;
-  bool get isClient => _role == 'client' || _role == 'cliente';
-  bool get isAdmin => _role == 'admin' || _role == 'administrador';
-  bool get isMechanic {
-    final r = _role?.trim().toLowerCase();
-    return r == 'mechanic' || r == 'mecanico' || r == 'mecánico' || r == 'tecnico' || r == 'técnico';
-  }
-  bool get isSecretary {
-    final r = _role?.trim().toLowerCase();
-    return r == 'secretary' || r == 'secretario' || r == 'secretaria';
-  }
+  UserRole get userRole => UserRole.fromBackendValue(_role);
+  bool get isClient => userRole == UserRole.client;
+  bool get isAdmin => userRole == UserRole.admin;
+  bool get isMechanic => userRole == UserRole.mechanic;
+  bool get isSecretary => userRole == UserRole.secretary;
   String get initials {
-    if (_userName != null && _userLastName != null && _userName!.isNotEmpty && _userLastName!.isNotEmpty) {
+    if (_userName != null &&
+        _userLastName != null &&
+        _userName!.isNotEmpty &&
+        _userLastName!.isNotEmpty) {
       return '${_userName![0].toUpperCase()}${_userLastName![0].toUpperCase()}';
     }
     return 'CM';

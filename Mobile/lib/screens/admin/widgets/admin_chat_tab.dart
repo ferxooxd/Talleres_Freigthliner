@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../models/user_role.dart';
 
 class AdminChatTab extends StatefulWidget {
   const AdminChatTab({super.key});
@@ -43,9 +44,11 @@ class _AdminChatTabState extends State<AdminChatTab> {
 
     // Filtrar administradores para no mostrarse a sí mismo y aplicar la búsqueda
     final chatUsers = adminProvider.users.where((u) {
-      if (u.rol == 'ADMINISTRADOR') return false;
+      if (u.userRole == UserRole.admin) return false;
       if (_searchQuery.isEmpty) return true;
-      return u.nombreCompleto.toLowerCase().contains(_searchQuery.toLowerCase());
+      return u.nombreCompleto.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
     }).toList();
 
     return Column(
@@ -65,8 +68,15 @@ class _AdminChatTabState extends State<AdminChatTab> {
             style: TextStyle(color: AppTheme.textColor(context), fontSize: 14),
             decoration: InputDecoration(
               hintText: 'Buscar...',
-              hintStyle: TextStyle(color: AppTheme.textMutedColor(context), fontSize: 14),
-              prefixIcon: Icon(Icons.search, color: AppTheme.textMutedColor(context), size: 20),
+              hintStyle: TextStyle(
+                color: AppTheme.textMutedColor(context),
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: AppTheme.textMutedColor(context),
+                size: 20,
+              ),
               filled: true,
               fillColor: AppTheme.inputColor(context),
               border: OutlineInputBorder(
@@ -97,13 +107,17 @@ class _AdminChatTabState extends State<AdminChatTab> {
                   itemCount: chatUsers.length,
                   itemBuilder: (context, index) {
                     final user = chatUsers[index];
-                    final isMechanic = user.rol.toUpperCase() == 'TECNICO' || user.rol.toUpperCase() == 'MECANICO';
-                    
+                    final isMechanic = user.userRole == UserRole.mechanic;
+
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: isMechanic ? Colors.yellow[700] : Theme.of(context).primaryColor,
+                        backgroundColor: isMechanic
+                            ? Colors.yellow[700]
+                            : Theme.of(context).primaryColor,
                         child: Text(
-                          user.nombre.isNotEmpty ? user.nombre[0].toUpperCase() : '?',
+                          user.nombre.isNotEmpty
+                              ? user.nombre[0].toUpperCase()
+                              : '?',
                           style: TextStyle(
                             color: isMechanic ? Colors.black : Colors.white,
                             fontWeight: FontWeight.bold,
@@ -112,17 +126,25 @@ class _AdminChatTabState extends State<AdminChatTab> {
                       ),
                       title: Text(
                         user.nombreCompleto,
-                        style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: AppTheme.textColor(context),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       subtitle: Text(
                         user.rol,
-                        style: TextStyle(color: AppTheme.textMutedColor(context)),
+                        style: TextStyle(
+                          color: AppTheme.textMutedColor(context),
+                        ),
                       ),
                       onTap: () {
-                        context.push('/chat', extra: {
-                          'contactId': user.idUsuario,
-                          'contactName': user.nombreCompleto,
-                        });
+                        context.push(
+                          '/chat',
+                          extra: {
+                            'contactId': user.idUsuario,
+                            'contactName': user.nombreCompleto,
+                          },
+                        );
                       },
                     );
                   },

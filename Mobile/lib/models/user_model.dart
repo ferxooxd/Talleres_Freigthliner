@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'user_role.dart';
 
 part 'user_model.g.dart';
 
@@ -25,9 +26,11 @@ class UserModel {
     this.especialidad,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   String get nombreCompleto => '$nombre $apellido';
   String get correoElectronico => correo;
+  UserRole get userRole => UserRole.fromBackendValue(rol);
 }

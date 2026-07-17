@@ -5,6 +5,7 @@ import '../../../providers/admin_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/service_order_model.dart';
 import '../../../models/user_model.dart';
+import '../../../models/user_role.dart';
 import 'service_order_form_dialog.dart';
 import '../../../core/utils/pdf_generator.dart';
 
@@ -36,7 +37,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ServiceOrderFormDialog()),
+                MaterialPageRoute(
+                  builder: (_) => const ServiceOrderFormDialog(),
+                ),
               ).then((result) {
                 if (result == true) {
                   provider.fetchServiceOrders();
@@ -44,20 +47,36 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               });
             },
             icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('Nueva Orden', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            label: const Text(
+              'Nueva Orden',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           body: () {
-            final activeOrders = provider.serviceOrders.where((o) => 
-                o.estadoOrden == 'EN_DIAGNOSTICO' || o.estadoOrden == 'EN_REPARACION' || o.estadoOrden == 'LISTO_PARA_ENTREGA'
-            ).toList();
+            final activeOrders = provider.serviceOrders
+                .where(
+                  (o) =>
+                      o.estadoOrden == 'EN_DIAGNOSTICO' ||
+                      o.estadoOrden == 'EN_REPARACION' ||
+                      o.estadoOrden == 'LISTO_PARA_ENTREGA',
+                )
+                .toList();
 
             if (provider.isLoading && activeOrders.isEmpty) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.green));
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.green),
+              );
             }
 
             if (activeOrders.isEmpty) {
               return Center(
-                child: Text('No hay órdenes de servicio activas.', style: TextStyle(color: AppTheme.textMutedColor(context))),
+                child: Text(
+                  'No hay órdenes de servicio activas.',
+                  style: TextStyle(color: AppTheme.textMutedColor(context)),
+                ),
               );
             }
 
@@ -81,18 +100,25 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, ServiceOrderModel order, AdminProvider provider) {
+  Widget _buildOrderCard(
+    BuildContext context,
+    ServiceOrderModel order,
+    AdminProvider provider,
+  ) {
     // Determine status color
     Color statusColor = AppTheme.green;
     if (order.estadoOrden == 'LISTO_PARA_ENTREGA') statusColor = AppTheme.amber;
     if (order.estadoOrden == 'ENTREGADO') statusColor = Colors.grey;
 
     final isAssigned = order.idMecanico != null;
-    final assignedMechanic = isAssigned 
-        ? provider.users.where((u) => u.idUsuario == order.idMecanico).firstOrNull 
+    final assignedMechanic = isAssigned
+        ? provider.users
+              .where((u) => u.idUsuario == order.idMecanico)
+              .firstOrNull
         : null;
 
-    final hasReport = order.informeTrabajo != null && order.informeTrabajo!.trim().isNotEmpty;
+    final hasReport =
+        order.informeTrabajo != null && order.informeTrabajo!.trim().isNotEmpty;
     final isDelivered = order.estadoOrden == 'ENTREGADO';
 
     return Card(
@@ -111,13 +137,18 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    order.numeroOrden.isNotEmpty ? order.numeroOrden : 'ORD-${order.idOrden}',
+                    order.numeroOrden.isNotEmpty
+                        ? order.numeroOrden
+                        : 'ORD-${order.idOrden}',
                     style: GoogleFonts.rajdhani(
                       color: statusColor,
                       fontWeight: FontWeight.bold,
@@ -127,16 +158,23 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                 ),
                 Text(
                   '${order.fechaIngreso} ${order.horaIngreso}',
-                  style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12),
+                  style: GoogleFonts.dmSans(
+                    color: AppTheme.textMutedColor(context),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             _buildInfoRow(Icons.person_rounded, 'Cliente', order.clienteNombre),
             const SizedBox(height: 12),
-            _buildInfoRow(Icons.directions_car_rounded, 'Placa', order.placaVehiculo ?? 'ID: ${order.idVehiculo}'),
+            _buildInfoRow(
+              Icons.directions_car_rounded,
+              'Placa',
+              order.placaVehiculo ?? 'ID: ${order.idVehiculo}',
+            ),
             _buildInfoRow(Icons.build_rounded, 'Estado', order.estadoOrden),
-            
+
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -147,17 +185,29 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.handyman_outlined, color: AppTheme.green, size: 20),
+                  const Icon(
+                    Icons.handyman_outlined,
+                    color: AppTheme.green,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Mecánico Asignado', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12)),
                         Text(
-                          isAssigned 
-                            ? (assignedMechanic != null ? '${assignedMechanic.nombre} ${assignedMechanic.apellido}' : 'Cargando...')
-                            : 'Sin Asignar',
+                          'Mecánico Asignado',
+                          style: GoogleFonts.dmSans(
+                            color: AppTheme.textMutedColor(context),
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          isAssigned
+                              ? (assignedMechanic != null
+                                    ? '${assignedMechanic.nombre} ${assignedMechanic.apellido}'
+                                    : 'Cargando...')
+                              : 'Sin Asignar',
                           style: GoogleFonts.rajdhani(
                             color: AppTheme.textColor(context),
                             fontSize: 16,
@@ -174,7 +224,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
-                      onPressed: () => _showAssignMechanicDialog(context, order, provider),
+                      onPressed: () =>
+                          _showAssignMechanicDialog(context, order, provider),
                       child: const Text('Asignar'),
                     ),
                 ],
@@ -188,15 +239,18 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   // Parse out images from [IMAGENES]...[/IMAGENES] markers
                   String displayText = rawText;
                   List<String> imageUrls = [];
-                  
+
                   final imgRegex = RegExp(r'\[IMAGENES\](.*?)\[/IMAGENES\]');
                   final match = imgRegex.firstMatch(rawText);
                   if (match != null) {
                     final imagesCsv = match.group(1) ?? '';
-                    imageUrls = imagesCsv.split(',').where((u) => u.trim().isNotEmpty).toList();
+                    imageUrls = imagesCsv
+                        .split(',')
+                        .where((u) => u.trim().isNotEmpty)
+                        .toList();
                     displayText = rawText.replaceAll(imgRegex, '').trim();
                   }
-                  
+
                   // Build the base URL for images (strip /api/v1 from the API base)
                   const apiBase = 'http://192.168.1.7:8000';
 
@@ -214,27 +268,52 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Informe del Mecánico', style: GoogleFonts.dmSans(color: AppTheme.green, fontSize: 12, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Informe del Mecánico',
+                              style: GoogleFonts.dmSans(
+                                color: AppTheme.green,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             IconButton(
-                              onPressed: () => _editReport(context, order, provider),
-                              icon: const Icon(Icons.edit, size: 16, color: AppTheme.green),
+                              onPressed: () =>
+                                  _editReport(context, order, provider),
+                              icon: const Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: AppTheme.green,
+                              ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(displayText, style: GoogleFonts.dmSans(color: AppTheme.textColor(context), fontSize: 14)),
+                        Text(
+                          displayText,
+                          style: GoogleFonts.dmSans(
+                            color: AppTheme.textColor(context),
+                            fontSize: 14,
+                          ),
+                        ),
                         if (imageUrls.isNotEmpty) ...[
                           const SizedBox(height: 12),
-                          Text('Fotos de repuestos:', style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 12)),
+                          Text(
+                            'Fotos de repuestos:',
+                            style: GoogleFonts.dmSans(
+                              color: AppTheme.textMutedColor(context),
+                              fontSize: 12,
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           SizedBox(
                             height: 90,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: imageUrls.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 8),
                               itemBuilder: (context, i) {
                                 final fullUrl = '$apiBase${imageUrls[i]}';
                                 return GestureDetector(
@@ -244,8 +323,13 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                                       builder: (_) => Dialog(
                                         backgroundColor: Colors.transparent,
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.network(fullUrl, fit: BoxFit.contain),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          child: Image.network(
+                                            fullUrl,
+                                            fit: BoxFit.contain,
+                                          ),
                                         ),
                                       ),
                                     );
@@ -257,12 +341,22 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                                       width: 90,
                                       height: 90,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        width: 90,
-                                        height: 90,
-                                        color: AppTheme.borderColor(context),
-                                        child: Icon(Icons.broken_image, color: AppTheme.textMutedColor(context)),
-                                      ),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                                width: 90,
+                                                height: 90,
+                                                color: AppTheme.borderColor(
+                                                  context,
+                                                ),
+                                                child: Icon(
+                                                  Icons.broken_image,
+                                                  color:
+                                                      AppTheme.textMutedColor(
+                                                        context,
+                                                      ),
+                                                ),
+                                              ),
                                     ),
                                   ),
                                 );
@@ -281,7 +375,8 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => _downloadPDF(context, order, assignedMechanic),
+                  onPressed: () =>
+                      _downloadPDF(context, order, assignedMechanic),
                   icon: const Icon(Icons.picture_as_pdf),
                   label: const Text('Descargar Orden (PDF)'),
                   style: OutlinedButton.styleFrom(
@@ -307,7 +402,9 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: hasReport ? () => _finishOrder(context, order, provider) : null,
+                  onPressed: hasReport
+                      ? () => _finishOrder(context, order, provider)
+                      : null,
                   icon: const Icon(Icons.check_circle_outline),
                   label: const Text('Finalizar Orden'),
                   style: ElevatedButton.styleFrom(
@@ -324,7 +421,10 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   child: Center(
                     child: Text(
                       'Requiere informe del mecánico para finalizar',
-                      style: GoogleFonts.dmSans(color: AppTheme.errorColor, fontSize: 12),
+                      style: GoogleFonts.dmSans(
+                        color: AppTheme.errorColor,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -335,12 +435,19 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     );
   }
 
-  Future<void> _finishOrder(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
+  Future<void> _finishOrder(
+    BuildContext context,
+    ServiceOrderModel order,
+    AdminProvider provider,
+  ) async {
     try {
       await provider.finishServiceOrder(order.idOrden);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Orden finalizada. Vehículo listo para entrega.'), backgroundColor: AppTheme.green),
+          const SnackBar(
+            content: Text('Orden finalizada. Vehículo listo para entrega.'),
+            backgroundColor: AppTheme.green,
+          ),
         );
       }
     } catch (e) {
@@ -352,12 +459,19 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     }
   }
 
-  Future<void> _confirmDelivery(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
+  Future<void> _confirmDelivery(
+    BuildContext context,
+    ServiceOrderModel order,
+    AdminProvider provider,
+  ) async {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.bgColor(context),
-        title: Text('Confirmar Entrega Física', style: TextStyle(color: AppTheme.textColor(context))),
+        title: Text(
+          'Confirmar Entrega Física',
+          style: TextStyle(color: AppTheme.textColor(context)),
+        ),
         content: Text(
           '¿Está seguro de que el vehículo va a salir del taller? Esta acción cambiará el estado a ENTREGADO.',
           style: TextStyle(color: AppTheme.textMutedColor(context)),
@@ -365,23 +479,35 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: AppTheme.textMutedColor(context)),
+            ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.amber, foregroundColor: Colors.black),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.amber,
+              foregroundColor: Colors.black,
+            ),
             onPressed: () async {
               Navigator.pop(dialogContext); // Close dialog
               try {
                 await provider.deliverServiceOrder(order.idOrden);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Entrega física confirmada.'), backgroundColor: AppTheme.green),
+                    const SnackBar(
+                      content: Text('Entrega física confirmada.'),
+                      backgroundColor: AppTheme.green,
+                    ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.red),
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: AppTheme.red,
+                    ),
                   );
                 }
               }
@@ -393,14 +519,17 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     );
   }
 
-
-  Future<void> _editReport(BuildContext context, ServiceOrderModel order, AdminProvider provider) async {
+  Future<void> _editReport(
+    BuildContext context,
+    ServiceOrderModel order,
+    AdminProvider provider,
+  ) async {
     final rawText = order.informeTrabajo ?? '';
-    
+
     // Extraer imágenes para no perderlas
     String textToEdit = rawText;
     String imagesBlock = '';
-    
+
     final imgRegex = RegExp(r'(\[IMAGENES\].*?\[/IMAGENES\])');
     final match = imgRegex.firstMatch(rawText);
     if (match != null) {
@@ -418,7 +547,10 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
           builder: (ctx, setState) {
             return AlertDialog(
               backgroundColor: AppTheme.cardColor(context),
-              title: Text('Editar Informe Técnico', style: TextStyle(color: AppTheme.textColor(context))),
+              title: Text(
+                'Editar Informe Técnico',
+                style: TextStyle(color: AppTheme.textColor(context)),
+              ),
               content: SizedBox(
                 width: 400,
                 child: TextField(
@@ -428,47 +560,82 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     hintText: 'Edite el informe del mecánico...',
-                    hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
+                    hintStyle: TextStyle(
+                      color: AppTheme.textMutedColor(context),
+                    ),
                   ),
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: isSaving ? null : () => Navigator.pop(ctx),
-                  child: Text('Cancelar', style: TextStyle(color: AppTheme.textMutedColor(context))),
+                  child: Text(
+                    'Cancelar',
+                    style: TextStyle(color: AppTheme.textMutedColor(context)),
+                  ),
                 ),
                 ElevatedButton(
-                  onPressed: isSaving ? null : () async {
-                    setState(() => isSaving = true);
-                    final newText = controller.text.trim();
-                    final finalText = imagesBlock.isNotEmpty ? '$newText\n\n$imagesBlock' : newText;
-                    
-                    try {
-                      await provider.updateOrderReport(order.idOrden, finalText);
-                      if (context.mounted) Navigator.pop(ctx);
-                    } catch (e) {
-                      setState(() => isSaving = false);
-                      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Error: $e')));
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.green, foregroundColor: Colors.black),
-                  child: isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)) : const Text('Guardar'),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          setState(() => isSaving = true);
+                          final newText = controller.text.trim();
+                          final finalText = imagesBlock.isNotEmpty
+                              ? '$newText\n\n$imagesBlock'
+                              : newText;
+                          final navigator = Navigator.of(ctx);
+                          final scaffoldMessenger = ScaffoldMessenger.of(ctx);
+
+                          try {
+                            await provider.updateOrderReport(
+                              order.idOrden,
+                              finalText,
+                            );
+                            navigator.pop();
+                          } catch (e) {
+                            setState(() => isSaving = false);
+                            scaffoldMessenger.showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.green,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const Text('Guardar'),
                 ),
               ],
             );
-          }
+          },
         );
-      }
+      },
     );
   }
 
-  void _downloadPDF(BuildContext context, ServiceOrderModel order, UserModel? mechanic) async {
+  void _downloadPDF(
+    BuildContext context,
+    ServiceOrderModel order,
+    UserModel? mechanic,
+  ) async {
     try {
       await PdfGenerator.generateServiceOrderPdf(order, mechanic);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al generar PDF: $e'), backgroundColor: AppTheme.red),
+          SnackBar(
+            content: Text('Error al generar PDF: $e'),
+            backgroundColor: AppTheme.red,
+          ),
         );
       }
     }
@@ -500,13 +667,21 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
     );
   }
 
-  void _showAssignMechanicDialog(BuildContext context, ServiceOrderModel order, AdminProvider provider) {
-    final mechanics = provider.users.where((u) => u.rol == 'MECANICO' || u.rol.toLowerCase() == 'tecnico').toList();
+  void _showAssignMechanicDialog(
+    BuildContext context,
+    ServiceOrderModel order,
+    AdminProvider provider,
+  ) {
+    final mechanics = provider.users
+        .where((u) => u.userRole == UserRole.mechanic)
+        .toList();
 
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.cardColor(context),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) {
         return Padding(
           padding: const EdgeInsets.all(24),
@@ -525,39 +700,70 @@ class _AdminOrdersTabState extends State<AdminOrdersTab> {
               const SizedBox(height: 8),
               Text(
                 'Selecciona el mecánico para la ${order.numeroOrden}',
-                style: GoogleFonts.dmSans(color: AppTheme.textMutedColor(context), fontSize: 14),
+                style: GoogleFonts.dmSans(
+                  color: AppTheme.textMutedColor(context),
+                  fontSize: 14,
+                ),
               ),
               Divider(color: AppTheme.borderColor(context), height: 32),
               if (mechanics.isEmpty)
-                Center(child: Text('No hay mecánicos registrados.', style: TextStyle(color: AppTheme.textMutedColor(context))))
-              else
-                ...mechanics.map((m) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(
-                    backgroundColor: AppTheme.green,
-                    child: Icon(Icons.person, color: Colors.black),
+                Center(
+                  child: Text(
+                    'No hay mecánicos registrados.',
+                    style: TextStyle(color: AppTheme.textMutedColor(context)),
                   ),
-                  title: Text('${m.nombre} ${m.apellido}', style: TextStyle(color: AppTheme.textColor(context), fontWeight: FontWeight.bold)),
-                  subtitle: Text(m.especialidad ?? 'Mecánico General', style: TextStyle(color: AppTheme.textMutedColor(context))),
-                  trailing: Icon(Icons.chevron_right, color: AppTheme.textMutedColor(context)),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    try {
-                      await provider.assignMechanic(order.idOrden, m.idUsuario);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Mecánico asignado exitosamente'), backgroundColor: AppTheme.green),
+                )
+              else
+                ...mechanics.map(
+                  (m) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const CircleAvatar(
+                      backgroundColor: AppTheme.green,
+                      child: Icon(Icons.person, color: Colors.black),
+                    ),
+                    title: Text(
+                      '${m.nombre} ${m.apellido}',
+                      style: TextStyle(
+                        color: AppTheme.textColor(context),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      m.especialidad ?? 'Mecánico General',
+                      style: TextStyle(color: AppTheme.textMutedColor(context)),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.textMutedColor(context),
+                    ),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      try {
+                        await provider.assignMechanic(
+                          order.idOrden,
+                          m.idUsuario,
                         );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Mecánico asignado exitosamente'),
+                              backgroundColor: AppTheme.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString()),
+                              backgroundColor: AppTheme.red,
+                            ),
+                          );
+                        }
                       }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.red),
-                        );
-                      }
-                    }
-                  },
-                )),
+                    },
+                  ),
+                ),
               const SizedBox(height: 16),
             ],
           ),
