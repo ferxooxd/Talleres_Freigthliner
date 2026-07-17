@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/message_model.dart';
@@ -8,6 +9,9 @@ import '../core/storage/secure_storage.dart';
 import '../core/network/api_client.dart';
 
 class ChatProvider extends ChangeNotifier {
+  ChatProvider({Dio? httpClient}) : _httpClient = httpClient ?? apiClient;
+
+  final Dio _httpClient;
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   bool _isConnected = false;
@@ -67,6 +71,7 @@ class ChatProvider extends ChangeNotifier {
       _isConnecting = false;
       _retrySeconds = 1; // Reset backoff en conexión exitosa
       notifyListeners();
+      unawaited(loadUnreadCounts());
 
       _subscription = _channel?.stream.listen(
         (data) {
@@ -246,6 +251,48 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadUnreadCounts() async {
+    try {
+      final response = await _httpClient.get('/chat/unread-counts');
+      if (response.statusCode != 200) return;
+
+      final data = response.data;
+      if (data is! Map) return;
+
+      final rawCounts = data['counts'];
+      if (rawCounts is! List) return;
+
+      final nextCounts = <int, int>{};
+      for (final item in rawCounts) {
+        if (item is! Map) continue;
+
+        final contactId = _parseMessageId(item['contact_id']);
+        final unreadCount = _parseMessageId(item['unread_count']);
+        if (contactId == null || unreadCount == null || unreadCount <= 0) {
+          continue;
+        }
+
+        nextCounts[contactId] = unreadCount;
+      }
+
+      _unreadCounts
+        ..clear()
+        ..addAll(nextCounts);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading unread chat counts: $e');
+    }
+  }
+
+  Future<void> markConversationRead(dynamic contactId) async {
+    try {
+      final encodedContactId = Uri.encodeComponent(contactId.toString());
+      await _httpClient.patch('/chat/conversations/$encodedContactId/read');
+    } catch (e) {
+      debugPrint('Error marking chat conversation as read: $e');
+    }
+  }
+
   void _scheduleReconnect() {
     if (!_reconnectEnabled) return;
 
@@ -256,12 +303,23 @@ class ChatProvider extends ChangeNotifier {
     });
   }
 
-  void setActiveContact(dynamic contactId) {
+  Future<void> setActiveContact(dynamic contactId) async {
     _activeContactId = contactId;
+    var shouldMarkRead = false;
+
     if (contactId != null) {
-      _unreadCounts.remove(contactId);
+      if (contactId is int) {
+        shouldMarkRead = (_unreadCounts.remove(contactId) ?? 0) > 0;
+      } else if (contactId.toString().toLowerCase() == 'admin') {
+        shouldMarkRead = _unreadCounts.isNotEmpty;
+        _unreadCounts.clear();
+      }
     }
     notifyListeners();
+
+    if (shouldMarkRead) {
+      await markConversationRead(contactId);
+    }
   }
 
   Future<void> loadHistory(dynamic contactId) async {
@@ -272,7 +330,7 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await apiClient.get(
+      final response = await _httpClient.get(
         '/chat/history/$contactId',
         queryParameters: {'skip': 0, 'limit': _pageSize},
       );
@@ -295,7 +353,7 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await apiClient.get(
+      final response = await _httpClient.get(
         '/chat/history/$contactId',
         queryParameters: {'skip': _messages.length, 'limit': _pageSize},
       );

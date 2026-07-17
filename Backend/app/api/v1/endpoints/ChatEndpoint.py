@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timezone
 from time import time
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, desc
+from sqlalchemy import or_, desc, func
 
 from app.core.security import decode_access_token
 from app.api.v1.deps import get_current_user
@@ -49,6 +49,40 @@ def _serialize_message_payload(message: Message) -> dict:
         "read_at": message.read_at.isoformat() if message.read_at else None,
         "status": _message_status(message),
     }
+
+
+def _unread_message_filter():
+    return or_(Message.is_read.is_(False), Message.is_read.is_(None))
+
+
+def _resolve_conversation_sender_ids(
+    contact_id: str,
+    current_user: User,
+    db: Session,
+) -> list[int]:
+    if contact_id.lower() == "admin":
+        admin_ids = [
+            user.id_usuario
+            for user in db.query(User).filter(User.rol == UserRole.admin).all()
+        ]
+        if not admin_ids:
+            raise HTTPException(status_code=404, detail="No hay administradores en el sistema")
+        return admin_ids
+
+    try:
+        actual_contact_id = int(contact_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="ID de contacto invalido")
+
+    if current_user.rol != UserRole.admin:
+        contact_user = db.query(User).filter(User.id_usuario == actual_contact_id).first()
+        if not contact_user or contact_user.rol != UserRole.admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Solo puedes marcar conversaciones con administradores.",
+            )
+
+    return [actual_contact_id]
 
 
 async def _finalize_delivery_state(message_id: int, delivered: bool) -> dict | None:
@@ -265,6 +299,85 @@ async def mark_message_as_read(
         )
 
     return _serialize_read_receipt(message)
+
+
+@router.get("/unread-counts")
+def get_unread_counts(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    rows = (
+        db.query(Message.sender_id, func.count(Message.id))
+        .filter(
+            Message.receiver_id == current_user.id_usuario,
+            _unread_message_filter(),
+        )
+        .group_by(Message.sender_id)
+        .order_by(Message.sender_id)
+        .all()
+    )
+
+    counts = [
+        {"contact_id": sender_id, "unread_count": int(unread_count)}
+        for sender_id, unread_count in rows
+    ]
+
+    return {
+        "total": sum(item["unread_count"] for item in counts),
+        "counts": counts,
+    }
+
+
+@router.patch("/conversations/{contact_id}/read")
+async def mark_conversation_as_read(
+    contact_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    sender_ids = _resolve_conversation_sender_ids(contact_id, current_user, db)
+    messages = (
+        db.query(Message)
+        .filter(
+            Message.receiver_id == current_user.id_usuario,
+            Message.sender_id.in_(sender_ids),
+            _unread_message_filter(),
+        )
+        .order_by(Message.timestamp)
+        .all()
+    )
+
+    if not messages:
+        return {"updated_count": 0, "message_ids": [], "read_at": None}
+
+    read_at = datetime.now(timezone.utc)
+    read_at_iso = read_at.isoformat()
+    events = []
+
+    for message in messages:
+        message.is_read = True
+        message.read_at = read_at
+        if message.delivered_at is None:
+            message.delivered_at = read_at
+        events.append((message.sender_id, message.id))
+
+    db.commit()
+
+    for sender_id, message_id in events:
+        await manager.send_personal_json(
+            {
+                "type": "message_read",
+                "message_id": message_id,
+                "reader_id": current_user.id_usuario,
+                "read_at": read_at_iso,
+            },
+            sender_id
+        )
+
+    return {
+        "updated_count": len(events),
+        "message_ids": [message_id for _, message_id in events],
+        "read_at": read_at_iso,
+    }
 
 
 @router.get("/history/{contact_id}")

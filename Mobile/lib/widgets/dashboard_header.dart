@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
+import 'unread_badge.dart';
 
 class DashboardHeader extends StatefulWidget {
   const DashboardHeader({
@@ -83,23 +84,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                   return Positioned(
                     right: -2,
                     top: -6,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.green,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${chatProvider.unreadCount}',
-                        style: GoogleFonts.dmSans(
-                          color: Colors.black,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
+                    child: UnreadBadge(count: chatProvider.unreadCount),
                   );
                 },
               ),

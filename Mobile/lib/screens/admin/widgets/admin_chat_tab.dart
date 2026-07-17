@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../providers/admin_provider.dart';
+import '../../../providers/chat_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/user_role.dart';
+import '../../../widgets/unread_badge.dart';
 
 class AdminChatTab extends StatefulWidget {
   const AdminChatTab({super.key});
@@ -135,6 +137,19 @@ class _AdminChatTabState extends State<AdminChatTab> {
                         user.rol,
                         style: TextStyle(
                           color: AppTheme.textMutedColor(context),
+                        ),
+                      ),
+                      trailing: SizedBox(
+                        width: 40,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Selector<ChatProvider, int>(
+                            selector: (_, provider) =>
+                                provider.unreadFor(user.idUsuario),
+                            builder: (context, unreadCount, child) {
+                              return UnreadBadge(count: unreadCount);
+                            },
+                          ),
                         ),
                       ),
                       onTap: () {

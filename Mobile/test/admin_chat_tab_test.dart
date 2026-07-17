@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/models/user_model.dart';
 import 'package:mobile/providers/admin_provider.dart';
+import 'package:mobile/providers/chat_provider.dart';
 import 'package:mobile/screens/admin/widgets/admin_chat_tab.dart';
 import 'package:provider/provider.dart';
 
@@ -51,8 +54,11 @@ void main() {
     ]);
 
     await tester.pumpWidget(
-      ChangeNotifierProvider<AdminProvider>.value(
-        value: provider,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AdminProvider>.value(value: provider),
+          ChangeNotifierProvider<ChatProvider>.value(value: ChatProvider()),
+        ],
         child: const MaterialApp(home: Scaffold(body: AdminChatTab())),
       ),
     );
@@ -60,5 +66,42 @@ void main() {
 
     expect(find.text('Ana Admin'), findsNothing);
     expect(find.text('Carlos Cliente'), findsOneWidget);
+  });
+
+  testWidgets('shows unread badge for the matching chat user only', (
+    tester,
+  ) async {
+    final adminProvider = FakeAdminProvider([
+      buildUser(id: 2, nombre: 'Carlos', apellido: 'Cliente', rol: 'Cliente'),
+      buildUser(id: 3, nombre: 'Marta', apellido: 'Mecanica', rol: 'Mecanico'),
+    ]);
+    final chatProvider = ChatProvider();
+    chatProvider.handleSocketData(
+      jsonEncode({
+        'id': 101,
+        'sender_id': 2,
+        'receiver_id': 1,
+        'content': 'Pendiente',
+        'timestamp': '2026-07-17T15:10:00Z',
+        'is_read': false,
+        'status': 'sent',
+      }),
+    );
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AdminProvider>.value(value: adminProvider),
+          ChangeNotifierProvider<ChatProvider>.value(value: chatProvider),
+        ],
+        child: const MaterialApp(home: Scaffold(body: AdminChatTab())),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Carlos Cliente'), findsOneWidget);
+    expect(find.text('Marta Mecanica'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+    expect(find.bySemanticsLabel('1 mensajes no leidos'), findsOneWidget);
   });
 }
