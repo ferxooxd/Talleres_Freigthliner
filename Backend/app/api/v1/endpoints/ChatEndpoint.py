@@ -3,6 +3,7 @@ from typing import Optional, List
 import asyncio
 import json
 import logging
+from datetime import datetime, timezone
 from time import time
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, desc
@@ -18,6 +19,14 @@ from app.integrations.firebase_client import send_push_notification
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+def _serialize_read_receipt(message: Message) -> dict:
+    return {
+        "id": message.id,
+        "is_read": message.is_read,
+        "read_at": message.read_at.isoformat() if message.read_at else None,
+    }
 
 
 def _process_message_in_db(sender_id: int, sender_role: str, raw_receiver_id: any, content: str) -> dict:
@@ -169,6 +178,42 @@ async def websocket_endpoint(
         logger.error(f"WebSocket error for user {sender_id}: {e}")
 
 
+@router.patch("/messages/{message_id}/read")
+async def mark_message_as_read(
+    message_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    message = db.query(Message).filter(Message.id == message_id).first()
+    if not message:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Mensaje no encontrado")
+
+    if message.receiver_id != current_user.id_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo el receptor puede marcar este mensaje como leido"
+        )
+
+    was_already_read = message.is_read is True
+    if not was_already_read:
+        message.is_read = True
+        message.read_at = datetime.now(timezone.utc)
+        db.commit()
+        db.refresh(message)
+
+        await manager.send_personal_json(
+            {
+                "type": "message_read",
+                "message_id": message.id,
+                "reader_id": current_user.id_usuario,
+                "read_at": message.read_at.isoformat() if message.read_at else None,
+            },
+            message.sender_id
+        )
+
+    return _serialize_read_receipt(message)
+
+
 @router.get("/history/{contact_id}")
 def get_chat_history(
     contact_id: str,
@@ -224,7 +269,8 @@ def get_chat_history(
             "receiver_id": msg.receiver_id,
             "content": msg.content,
             "timestamp": msg.timestamp.isoformat() if msg.timestamp else None,
-            "is_read": msg.is_read
+            "is_read": msg.is_read,
+            "read_at": msg.read_at.isoformat() if msg.read_at else None
         }
         for msg in messages
     ]
