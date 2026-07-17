@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/message_model.dart';
+import '../models/message_status.dart';
 import '../core/storage/secure_storage.dart';
 import '../core/network/api_client.dart';
 
 class ChatProvider extends ChangeNotifier {
   WebSocketChannel? _channel;
+  StreamSubscription<dynamic>? _subscription;
   bool _isConnected = false;
+  bool _isConnecting = false;
+  bool _reconnectEnabled = true;
   bool get isConnected => _isConnected;
 
   // Lista de mensajes de la conversación activa
@@ -40,11 +44,18 @@ class ChatProvider extends ChangeNotifier {
   int get unreadCount => totalUnread;
 
   Future<void> connect() async {
-    if (_isConnected) return;
+    if (_isConnected || _isConnecting) return;
+
+    _isConnecting = true;
+    _reconnectEnabled = true;
+    _retryTimer?.cancel();
 
     try {
       final token = await SecureStorage.getToken();
-      if (token == null) return;
+      if (token == null) {
+        _isConnecting = false;
+        return;
+      }
 
       final wsUrl = ApiClient.baseUrl
           .replaceFirst('http', 'ws')
@@ -53,68 +64,197 @@ class ChatProvider extends ChangeNotifier {
 
       _channel = WebSocketChannel.connect(uri);
       _isConnected = true;
+      _isConnecting = false;
       _retrySeconds = 1; // Reset backoff en conexión exitosa
       notifyListeners();
 
-      _channel?.stream.listen(
+      _subscription = _channel?.stream.listen(
         (data) {
-          final decoded = jsonDecode(data);
-          if (decoded.containsKey('error')) {
-            debugPrint('Chat error: ${decoded['error']}');
-            return;
-          }
-
-          final message = MessageModel.fromJson(decoded);
-
-          if (_activeContactId == message.senderId ||
-              _activeContactId == message.receiverId ||
-              _activeContactId == 'admin') {
-            // Reemplazar mensaje optimista si existe, o agregar el nuevo
-            final optimisticIndex = _messages.indexWhere(
-                (m) => m.id < 0 && m.content == message.content && m.senderId == message.senderId);
-            
-            if (optimisticIndex != -1) {
-              final newMessages = List<MessageModel>.from(_messages);
-              newMessages[optimisticIndex] = message;
-              _messages = newMessages;
-            } else if (!_messages.any((m) => m.id == message.id)) {
-              _messages = [message, ..._messages];
-            }
-
-          } else {
-            // Incrementar contador para el contacto específico
-            _unreadCounts[message.senderId] =
-                (_unreadCounts[message.senderId] ?? 0) + 1;
-          }
-          notifyListeners();
+          handleSocketData(data);
         },
         onDone: () {
-          _isConnected = false;
-          notifyListeners();
-          _scheduleReconnect();
+          _handleSocketClosed();
         },
         onError: (error) {
           debugPrint('WebSocket error: $error');
-          _isConnected = false;
-          notifyListeners();
-          _scheduleReconnect();
+          _handleSocketClosed();
         },
       );
     } catch (e) {
+      _isConnecting = false;
       debugPrint('Error connecting to WebSocket: $e');
       _scheduleReconnect();
     }
   }
 
+  @visibleForTesting
+  void handleSocketData(dynamic data) {
+    try {
+      final decoded = data is String ? jsonDecode(data) : data;
+      if (decoded is! Map) return;
+
+      _handleSocketPayload(Map<String, dynamic>.from(decoded));
+    } catch (e) {
+      debugPrint('Error parsing chat socket payload: $e');
+    }
+  }
+
+  void _handleSocketPayload(Map<String, dynamic> decoded) {
+    if (decoded.containsKey('error')) {
+      debugPrint('Chat error: ${decoded['error']}');
+      return;
+    }
+
+    if (decoded['type'] == 'message_delivered') {
+      final messageId = _parseMessageId(decoded['message_id']);
+      if (messageId != null) {
+        applyMessageDelivered(
+          messageId,
+          deliveredAt: _parseOptionalString(decoded['delivered_at']),
+        );
+      }
+      return;
+    }
+
+    if (decoded['type'] == 'message_read') {
+      final messageId = _parseMessageId(decoded['message_id']);
+      if (messageId != null) {
+        applyMessageRead(
+          messageId,
+          readAt: _parseOptionalString(decoded['read_at']),
+        );
+      }
+      return;
+    }
+
+    final message = MessageModel.fromJson(decoded);
+
+    if (_activeContactId == message.senderId ||
+        _activeContactId == message.receiverId ||
+        _activeContactId == 'admin') {
+      final optimisticIndex = _messages.indexWhere(
+        (m) =>
+            m.id < 0 &&
+            m.content == message.content &&
+            m.senderId == message.senderId,
+      );
+
+      if (optimisticIndex != -1) {
+        final newMessages = List<MessageModel>.from(_messages);
+        newMessages[optimisticIndex] = message;
+        _messages = newMessages;
+      } else if (!_messages.any((m) => m.id == message.id)) {
+        _messages = [message, ..._messages];
+      }
+    } else {
+      _unreadCounts[message.senderId] =
+          (_unreadCounts[message.senderId] ?? 0) + 1;
+    }
+
+    notifyListeners();
+  }
+
+  void _handleSocketClosed() {
+    _subscription = null;
+    _channel = null;
+    _isConnecting = false;
+
+    if (_isConnected) {
+      _isConnected = false;
+      notifyListeners();
+    }
+
+    if (_reconnectEnabled) {
+      _scheduleReconnect();
+    }
+  }
+
+  List<int> get messageIds =>
+      _messages.map((message) => message.id).toList(growable: false);
+
+  MessageModel? messageById(int messageId) {
+    for (final message in _messages) {
+      if (message.id == messageId) return message;
+    }
+    return null;
+  }
+
+  void applyMessageRead(int messageId, {String? readAt}) {
+    final index = _messages.indexWhere((message) => message.id == messageId);
+    if (index == -1) return;
+
+    final current = _messages[index];
+    final effectiveReadAt =
+        readAt ?? current.readAt ?? DateTime.now().toUtc().toIso8601String();
+    if (current.isRead == true &&
+        current.readAt == effectiveReadAt &&
+        current.apiStatus == MessageStatus.read.apiValue) {
+      return;
+    }
+
+    final updatedMessages = List<MessageModel>.from(_messages);
+    updatedMessages[index] = current.copyWith(
+      isRead: true,
+      readAt: effectiveReadAt,
+      apiStatus: MessageStatus.read.apiValue,
+    );
+    _messages = updatedMessages;
+    notifyListeners();
+  }
+
+  void applyMessageDelivered(int messageId, {String? deliveredAt}) {
+    final index = _messages.indexWhere((message) => message.id == messageId);
+    if (index == -1) return;
+
+    final current = _messages[index];
+    if (current.status == MessageStatus.read) return;
+
+    final effectiveDeliveredAt =
+        deliveredAt ??
+        current.deliveredAt ??
+        DateTime.now().toUtc().toIso8601String();
+    if (current.status == MessageStatus.delivered &&
+        current.deliveredAt == effectiveDeliveredAt) {
+      return;
+    }
+
+    final updatedMessages = List<MessageModel>.from(_messages);
+    updatedMessages[index] = current.copyWith(
+      deliveredAt: effectiveDeliveredAt,
+      apiStatus: MessageStatus.delivered.apiValue,
+    );
+    _messages = updatedMessages;
+    notifyListeners();
+  }
+
+  int? _parseMessageId(dynamic rawValue) {
+    if (rawValue is int) return rawValue;
+    if (rawValue is num) return rawValue.toInt();
+    if (rawValue is String) return int.tryParse(rawValue);
+    return null;
+  }
+
+  String? _parseOptionalString(dynamic rawValue) {
+    if (rawValue == null) return null;
+    if (rawValue is String) return rawValue.isEmpty ? null : rawValue;
+    return rawValue.toString();
+  }
+
+  @visibleForTesting
+  void replaceMessagesForTesting(List<MessageModel> messages) {
+    _messages = List<MessageModel>.from(messages);
+    notifyListeners();
+  }
+
   void _scheduleReconnect() {
+    if (!_reconnectEnabled) return;
+
     _retryTimer?.cancel();
     _retryTimer = Timer(Duration(seconds: _retrySeconds), () {
-      _retrySeconds = (_retrySeconds * 2).clamp(1, 30);
+      _retrySeconds = (_retrySeconds * 2).clamp(1, 30).toInt();
       connect();
     });
   }
-
-
 
   void setActiveContact(dynamic contactId) {
     _activeContactId = contactId;
@@ -177,10 +317,7 @@ class ChatProvider extends ChangeNotifier {
     if (!_isConnected || _channel == null) return;
     if (content.length > 2000) return; // Límite de seguridad
 
-    final payload = {
-      'receiver_id': receiverId,
-      'content': content,
-    };
+    final payload = {'receiver_id': receiverId, 'content': content};
 
     // Inserción optimista para que el mensaje aparezca de inmediato en la UI
     if (senderId != null) {
@@ -191,6 +328,7 @@ class ChatProvider extends ChangeNotifier {
         content: content,
         timestamp: DateTime.now().toIso8601String(),
         isRead: false,
+        apiStatus: MessageStatus.sent.apiValue,
       );
       _messages = [tempMsg, ..._messages];
       notifyListeners();
@@ -200,7 +338,11 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void disconnect() {
+    _reconnectEnabled = false;
+    _isConnecting = false;
     _retryTimer?.cancel();
+    _subscription?.cancel();
+    _subscription = null;
     _channel?.sink.close();
     _channel = null;
     _isConnected = false;

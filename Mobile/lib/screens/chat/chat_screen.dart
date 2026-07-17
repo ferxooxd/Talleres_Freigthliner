@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../models/message_model.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
+import 'widgets/chat_message_bubble.dart';
 
 class ChatScreen extends StatefulWidget {
   final dynamic contactId;
@@ -71,8 +74,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatProvider = context.watch<ChatProvider>();
-
     return Scaffold(
       backgroundColor: AppTheme.bgColor(context),
       appBar: AppBar(
@@ -83,66 +84,28 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           // Banner de desconexión
-          if (!chatProvider.isConnected)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              color: Colors.orange[800],
-              child: const Text(
-                'Reconectando...',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
+          Selector<ChatProvider, bool>(
+            selector: (_, provider) => provider.isConnected,
+            builder: (context, isConnected, child) {
+              if (isConnected) return const SizedBox.shrink();
+
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                color: Colors.orange[800],
+                child: const Text(
+                  'Reconectando...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              );
+            },
+          ),
           Expanded(
-            child: chatProvider.isLoadingHistory && chatProvider.messages.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    controller: _scrollController,
-                    reverse: true,
-                    itemCount: chatProvider.messages.length +
-                        (chatProvider.hasMoreHistory ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      // Loader de paginación al final
-                      if (index == chatProvider.messages.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(
-                              child: CircularProgressIndicator(strokeWidth: 2)),
-                        );
-                      }
-
-                      final message = chatProvider.messages[index];
-                      final isMe = message.senderId == _currentUserId;
-
-                      return Align(
-                        key: ValueKey(message.id),
-                        alignment:
-                            isMe ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: isMe
-                                ? AppTheme.green
-                                : AppTheme.cardColor(context),
-                            borderRadius: BorderRadius.circular(16).copyWith(
-                              bottomRight:
-                                  isMe ? const Radius.circular(0) : null,
-                              bottomLeft:
-                                  !isMe ? const Radius.circular(0) : null,
-                            ),
-                            border: isMe ? null : Border.all(color: AppTheme.borderColor(context)),
-                          ),
-                          child: Text(
-                            message.content,
-                            style: TextStyle(color: isMe ? Colors.black : AppTheme.textColor(context)),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+            child: _ChatMessagesView(
+              scrollController: _scrollController,
+              currentUserId: _currentUserId,
+            ),
           ),
           SafeArea(
             child: Padding(
@@ -153,12 +116,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       controller: _messageController,
                       maxLength: 2000,
-                      maxLengthEnforcement:
-                          MaxLengthEnforcement.enforced,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       style: TextStyle(color: AppTheme.textColor(context)),
                       decoration: InputDecoration(
                         hintText: 'Escribe un mensaje...',
-                        hintStyle: TextStyle(color: AppTheme.textMutedColor(context)),
+                        hintStyle: TextStyle(
+                          color: AppTheme.textMutedColor(context),
+                        ),
                         counterText: '', // Oculta el contador "0/2000"
                         filled: true,
                         fillColor: AppTheme.inputColor(context),
@@ -167,7 +131,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),
@@ -188,4 +154,101 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+}
+
+class _ChatMessagesView extends StatelessWidget {
+  const _ChatMessagesView({
+    required this.scrollController,
+    required this.currentUserId,
+  });
+
+  final ScrollController scrollController;
+  final int? currentUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<ChatProvider, _MessagesViewportState>(
+      selector: (_, provider) => _MessagesViewportState(
+        isLoadingHistory: provider.isLoadingHistory,
+        hasMoreHistory: provider.hasMoreHistory,
+        messageIds: provider.messageIds,
+      ),
+      builder: (context, state, child) {
+        if (state.isLoadingHistory && state.messageIds.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return ListView.builder(
+          controller: scrollController,
+          reverse: true,
+          itemCount: state.messageIds.length + (state.hasMoreHistory ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == state.messageIds.length) {
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              );
+            }
+
+            final messageId = state.messageIds[index];
+            return _ChatMessageListItem(
+              key: ValueKey(messageId),
+              messageId: messageId,
+              currentUserId: currentUserId,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _ChatMessageListItem extends StatelessWidget {
+  const _ChatMessageListItem({
+    super.key,
+    required this.messageId,
+    required this.currentUserId,
+  });
+
+  final int messageId;
+  final int? currentUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<ChatProvider, MessageModel?>(
+      selector: (_, provider) => provider.messageById(messageId),
+      builder: (context, message, child) {
+        if (message == null) return const SizedBox.shrink();
+
+        return ChatMessageBubble(
+          message: message,
+          isMe: message.senderId == currentUserId,
+        );
+      },
+    );
+  }
+}
+
+class _MessagesViewportState {
+  const _MessagesViewportState({
+    required this.isLoadingHistory,
+    required this.hasMoreHistory,
+    required this.messageIds,
+  });
+
+  final bool isLoadingHistory;
+  final bool hasMoreHistory;
+  final List<int> messageIds;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _MessagesViewportState &&
+        other.isLoadingHistory == isLoadingHistory &&
+        other.hasMoreHistory == hasMoreHistory &&
+        listEquals(other.messageIds, messageIds);
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(isLoadingHistory, hasMoreHistory, Object.hashAll(messageIds));
 }
