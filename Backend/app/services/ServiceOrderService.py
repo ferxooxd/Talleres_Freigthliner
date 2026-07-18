@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
+from app.core.Enum import UserRole
 from app.models.ServiceOrderEntity import ServiceOrder, ServiceOrderState
+from app.models.UserEntity import User
 from app.models.VehicleEntity import Vehicle
 from app.models.VehicleUserEntity import VehicleUser
 from app.schemas.ServiceOrderSchema import ServiceOrderCreate, ServiceOrderUpdate
+from app.services.NotificationService import NotificationService, NotificationType
 from datetime import datetime
 
 class ServiceOrderService:
@@ -77,8 +80,14 @@ class ServiceOrderService:
         return db.query(ServiceOrder).offset(skip).limit(limit).all()
 
     @staticmethod
-    def update_order(db: Session, id_orden: int, update_data: ServiceOrderUpdate):
+    def update_order(
+        db: Session,
+        id_orden: int,
+        update_data: ServiceOrderUpdate,
+        background_tasks=None,
+    ):
         db_order = ServiceOrderService.get_order(db, id_orden)
+        previous_state = db_order.estado_orden
         
         update_dict = update_data.model_dump(exclude_unset=True)
         
@@ -108,7 +117,46 @@ class ServiceOrderService:
             
         db.commit()
         db.refresh(db_order)
+
+        if (
+            nuevo_estado == ServiceOrderState.LISTO_PARA_ENTREGA
+            and previous_state != ServiceOrderState.LISTO_PARA_ENTREGA
+        ):
+            ServiceOrderService._notify_order_ready(
+                db,
+                db_order,
+                background_tasks=background_tasks,
+            )
+
         return db_order
+
+    @staticmethod
+    def _notify_order_ready(db: Session, order: ServiceOrder, background_tasks=None):
+        owner_user_ids = [
+            row[0]
+            for row in db.query(VehicleUser.id_usuario)
+            .join(User, VehicleUser.id_usuario == User.id_usuario)
+            .filter(
+                VehicleUser.id_vehiculo == order.id_vehiculo,
+                VehicleUser.rol_vehiculo == "Propietario",
+                User.rol == UserRole.client,
+            )
+            .all()
+        ]
+        if not owner_user_ids:
+            return
+
+        NotificationService.notify(
+            user_ids=owner_user_ids,
+            type=NotificationType.order_ready,
+            title="Orden lista",
+            body="Tu vehiculo esta listo para entrega",
+            data={
+                "type": NotificationType.order_ready.value,
+                "order_id": str(order.id_orden),
+            },
+            background_tasks=background_tasks,
+        )
 
     @staticmethod
     def get_active_order_by_placa(db: Session, placa: str):

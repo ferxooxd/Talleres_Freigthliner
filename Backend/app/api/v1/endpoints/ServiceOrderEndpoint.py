@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.api.deps import require_roles
+from app.core.Enum import UserRole
 from app.db.session import get_db
 from app.schemas.ServiceOrderSchema import ServiceOrderCreate, ServiceOrderUpdate, ServiceOrderResponse
 from app.services.ServiceOrderService import ServiceOrderService
@@ -30,11 +32,24 @@ def get_service_order(id_orden: int, db: Session = Depends(get_db)):
     return ServiceOrderService.get_order(db=db, id_orden=id_orden)
 
 @router.patch("/{id_orden}", response_model=ServiceOrderResponse)
-def update_service_order(id_orden: int, order_update: ServiceOrderUpdate, db: Session = Depends(get_db)):
+def update_service_order(
+    id_orden: int,
+    order_update: ServiceOrderUpdate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_roles(UserRole.admin.value, UserRole.secretary.value)
+    ),
+):
     """
     Actualiza una orden de servicio (Ej: Asignar mecánico, llenar diagnóstico, cambiar estado a Listo).
     """
-    return ServiceOrderService.update_order(db=db, id_orden=id_orden, update_data=order_update)
+    return ServiceOrderService.update_order(
+        db=db,
+        id_orden=id_orden,
+        update_data=order_update,
+        background_tasks=background_tasks,
+    )
 
 @router.get("/vehicle/{placa}", response_model=ServiceOrderResponse)
 def get_active_order_by_placa(placa: str, db: Session = Depends(get_db)):
