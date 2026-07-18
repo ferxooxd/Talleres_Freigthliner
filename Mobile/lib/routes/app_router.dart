@@ -58,10 +58,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
@@ -71,7 +68,15 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         builder: (context, state) => const ClientDashboardScreen(),
       ),
       GoRoute(
+        path: '/client/orders/:orderId',
+        builder: (context, state) => const ClientDashboardScreen(),
+      ),
+      GoRoute(
         path: '/mechanic/dashboard',
+        builder: (context, state) => const MechanicDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/mechanic/orders/:orderId',
         builder: (context, state) => const MechanicDashboardScreen(),
       ),
       GoRoute(
