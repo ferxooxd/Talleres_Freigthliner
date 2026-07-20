@@ -22,7 +22,13 @@ class FakeAdminProvider extends AdminProvider {
   List<UserModel> get users => _users;
 
   @override
+  List<UserModel> get chatContacts => _users;
+
+  @override
   Future<void> fetchUsers() async {}
+
+  @override
+  Future<void> fetchChatContacts() async {}
 }
 
 UserModel buildUser({
@@ -30,6 +36,7 @@ UserModel buildUser({
   required String nombre,
   required String apellido,
   required String rol,
+  DateTime? lastMessageAt,
 }) {
   return UserModel(
     idUsuario: id,
@@ -40,6 +47,7 @@ UserModel buildUser({
     correo: '$id@example.com',
     rol: rol,
     especialidad: null,
+    lastMessageAt: lastMessageAt,
   );
 }
 
@@ -104,6 +112,107 @@ void main() {
     expect(find.text('Marta Mecanica'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
     expect(find.bySemanticsLabel('1 mensajes no leidos'), findsOneWidget);
+  });
+
+  testWidgets('orders chats by latest message activity', (tester) async {
+    final adminProvider = FakeAdminProvider([
+      buildUser(
+        id: 2,
+        nombre: 'Carlos',
+        apellido: 'Cliente',
+        rol: 'Cliente',
+        lastMessageAt: DateTime.parse('2026-07-17T09:00:00Z'),
+      ),
+      buildUser(
+        id: 3,
+        nombre: 'Marta',
+        apellido: 'Mecanica',
+        rol: 'Tecnico',
+        lastMessageAt: DateTime.parse('2026-07-17T11:00:00Z'),
+      ),
+      buildUser(
+        id: 4,
+        nombre: 'Sara',
+        apellido: 'Secretaria',
+        rol: 'Secretario',
+      ),
+    ]);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AdminProvider>.value(value: adminProvider),
+          ChangeNotifierProvider<ChatProvider>.value(value: ChatProvider()),
+        ],
+        child: const MaterialApp(home: Scaffold(body: AdminChatTab())),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      tester.getTopLeft(find.text('Marta Mecanica')).dy,
+      lessThan(tester.getTopLeft(find.text('Carlos Cliente')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Carlos Cliente')).dy,
+      lessThan(tester.getTopLeft(find.text('Sara Secretaria')).dy),
+    );
+  });
+
+  testWidgets('moves a chat to the top when a live message arrives', (
+    tester,
+  ) async {
+    final adminProvider = FakeAdminProvider([
+      buildUser(
+        id: 2,
+        nombre: 'Carlos',
+        apellido: 'Cliente',
+        rol: 'Cliente',
+        lastMessageAt: DateTime.parse('2026-07-17T09:00:00Z'),
+      ),
+      buildUser(
+        id: 3,
+        nombre: 'Marta',
+        apellido: 'Mecanica',
+        rol: 'Tecnico',
+        lastMessageAt: DateTime.parse('2026-07-17T08:00:00Z'),
+      ),
+    ]);
+    final chatProvider = ChatProvider();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AdminProvider>.value(value: adminProvider),
+          ChangeNotifierProvider<ChatProvider>.value(value: chatProvider),
+        ],
+        child: const MaterialApp(home: Scaffold(body: AdminChatTab())),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      tester.getTopLeft(find.text('Carlos Cliente')).dy,
+      lessThan(tester.getTopLeft(find.text('Marta Mecanica')).dy),
+    );
+
+    chatProvider.handleSocketData(
+      jsonEncode({
+        'id': 201,
+        'sender_id': 3,
+        'receiver_id': 1,
+        'content': 'Nuevo mensaje',
+        'timestamp': '2026-07-17T12:00:00Z',
+        'is_read': false,
+        'status': 'sent',
+      }),
+    );
+    await tester.pump();
+
+    expect(
+      tester.getTopLeft(find.text('Marta Mecanica')).dy,
+      lessThan(tester.getTopLeft(find.text('Carlos Cliente')).dy),
+    );
   });
 
   testWidgets('uses minimal avatars and compact unread badges', (tester) async {

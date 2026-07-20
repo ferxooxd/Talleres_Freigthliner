@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -11,7 +11,11 @@ from app.services.BookingService import BookingService
 router = APIRouter()
 
 @router.post("/", response_model=BookingResponse, status_code=status.HTTP_201_CREATED)
-def register_booking(booking: BookingCreate, db: Session = Depends(get_db)):
+def register_booking(
+    booking: BookingCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     """
     Endpoint para crear una nueva cita/agendamiento mecánico.
     Valida primero que el vehículo exista antes de agendar.
@@ -29,7 +33,11 @@ def register_booking(booking: BookingCreate, db: Session = Depends(get_db)):
         )
 
     # Si pasa la validación, lo creamos
-    return BookingService.create_booking(db=db, booking_data=booking)
+    return BookingService.create_booking(
+        db=db,
+        booking_data=booking,
+        background_tasks=background_tasks,
+    )
 
 
 @router.get("/", response_model=List[BookingResponse])

@@ -1,14 +1,17 @@
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from app.core.Enum import UserRole
 from app.models.BookingEntity import Booking, ConfirmationState
 from app.models.ServiceOrderEntity import ServiceOrder, ServiceOrderState
+from app.models.UserEntity import User
 from app.schemas.BookingSchema import BookingCreate, BookingUpdate
+from app.services.NotificationService import NotificationService, NotificationType
 
 class BookingService:
 
     @staticmethod
-    def create_booking(db: Session, booking_data: BookingCreate):
+    def create_booking(db: Session, booking_data: BookingCreate, background_tasks=None):
         """Crea un nuevo agendamiento en la base de datos aplicando reglas de negocio"""
         # Validar max 10 agendamientos por día
         daily_bookings_count = db.query(Booking).filter(Booking.fecha_cita == booking_data.fecha_cita).count()
@@ -36,7 +39,45 @@ class BookingService:
         db.add(db_booking)
         db.commit()
         db.refresh(db_booking)
+        BookingService._notify_admins_about_new_booking(
+            db,
+            db_booking,
+            background_tasks=background_tasks,
+        )
         return db_booking
+
+    @staticmethod
+    def _notify_admins_about_new_booking(db: Session, booking: Booking, background_tasks=None):
+        admin_user_ids = [
+            row[0]
+            for row in db.query(User.id_usuario)
+            .filter(User.rol == UserRole.admin)
+            .order_by(User.id_usuario)
+            .all()
+        ]
+        if not admin_user_ids:
+            return
+
+        booking_date = booking.fecha_cita.isoformat()
+        booking_time = booking.hora_cita.strftime("%H:%M")
+        client_name = booking.cliente_nombre
+        vehicle_plate = booking.placa_vehiculo
+
+        NotificationService.notify(
+            user_ids=admin_user_ids,
+            type=NotificationType.booking_created,
+            title="Nueva cita agendada",
+            body=(
+                f"{client_name} agendo una cita para {booking_date} "
+                f"a las {booking_time}. Vehiculo: {vehicle_plate}"
+            ),
+            data={
+                "type": NotificationType.booking_created.value,
+                "booking_id": str(booking.id_agendamiento),
+                "booking_date": booking_date,
+            },
+            background_tasks=background_tasks,
+        )
 
     @staticmethod
     def get_all_bookings(db: Session, skip: int = 0, limit: int = 100):

@@ -63,6 +63,23 @@ void main() {
     });
   });
 
+  test('booking_created notification navigates to admin bookings', () {
+    final navigator = FakeNotificationNavigator();
+    final service = NotificationNavigationService(navigator);
+
+    final handled = service.handleData({
+      'type': 'booking_created',
+      'booking_id': '15',
+    });
+
+    expect(handled, isTrue);
+    expect(navigator.destinations.single.location, '/admin/bookings/15');
+    expect(navigator.destinations.single.extra, {
+      'bookingId': 15,
+      'type': 'booking_created',
+    });
+  });
+
   test('unknown notification type uses controlled fallback', () {
     final navigator = FakeNotificationNavigator();
     final service = NotificationNavigationService(navigator);

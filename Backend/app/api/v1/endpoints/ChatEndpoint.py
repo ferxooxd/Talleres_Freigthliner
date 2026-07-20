@@ -5,8 +5,9 @@ import json
 import logging
 from datetime import datetime, timezone
 from time import time
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, desc, func
+from sqlalchemy import case, or_, desc, func
 
 from app.core.security import decode_access_token
 from app.api.v1.deps import get_current_user
@@ -19,6 +20,18 @@ from app.services.NotificationService import NotificationService, NotificationTy
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+class ChatContactResponse(BaseModel):
+    id_usuario: int
+    nombre: str
+    apellido: str
+    telefono: str | None = None
+    cedula: str | None = None
+    correo: str
+    rol: UserRole
+    especialidad: str | None = None
+    last_message_at: datetime | None = None
 
 
 def _serialize_read_receipt(message: Message) -> dict:
@@ -53,6 +66,20 @@ def _serialize_message_payload(message: Message) -> dict:
 
 def _unread_message_filter():
     return or_(Message.is_read.is_(False), Message.is_read.is_(None))
+
+
+def _chat_contact_response(user: User, last_message_at: datetime | None) -> ChatContactResponse:
+    return ChatContactResponse(
+        id_usuario=user.id_usuario,
+        nombre=user.nombre,
+        apellido=user.apellido,
+        telefono=user.telefono,
+        cedula=user.cedula,
+        correo=user.correo,
+        rol=user.rol,
+        especialidad=user.especialidad,
+        last_message_at=last_message_at,
+    )
 
 
 def _resolve_conversation_sender_ids(
@@ -412,6 +439,56 @@ def get_unread_counts(
         "total": sum(item["unread_count"] for item in counts),
         "counts": counts,
     }
+
+
+@router.get("/contacts", response_model=List[ChatContactResponse])
+def get_admin_chat_contacts(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.rol != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo administradores pueden listar contactos de chat.",
+        )
+
+    contact_id = case(
+        (Message.sender_id == current_user.id_usuario, Message.receiver_id),
+        else_=Message.sender_id,
+    ).label("contact_id")
+
+    latest_messages = (
+        db.query(
+            contact_id,
+            func.max(Message.timestamp).label("last_message_at"),
+        )
+        .filter(
+            or_(
+                Message.sender_id == current_user.id_usuario,
+                Message.receiver_id == current_user.id_usuario,
+            )
+        )
+        .group_by(contact_id)
+        .subquery()
+    )
+
+    rows = (
+        db.query(User, latest_messages.c.last_message_at)
+        .outerjoin(latest_messages, latest_messages.c.contact_id == User.id_usuario)
+        .filter(User.rol != UserRole.admin)
+        .order_by(
+            latest_messages.c.last_message_at.is_(None),
+            desc(latest_messages.c.last_message_at),
+            User.nombre.asc(),
+            User.apellido.asc(),
+        )
+        .all()
+    )
+
+    return [
+        _chat_contact_response(user, last_message_at)
+        for user, last_message_at in rows
+    ]
 
 
 @router.patch("/conversations/{contact_id}/read")

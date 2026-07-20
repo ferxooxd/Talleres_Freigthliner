@@ -14,6 +14,8 @@ class UserModel {
   final String correo;
   final String rol;
   final String? especialidad;
+  @JsonKey(name: 'last_message_at')
+  final DateTime? lastMessageAt;
 
   UserModel({
     required this.idUsuario,
@@ -24,6 +26,7 @@ class UserModel {
     required this.correo,
     required this.rol,
     this.especialidad,
+    this.lastMessageAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

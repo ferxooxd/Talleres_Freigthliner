@@ -93,6 +93,16 @@ class AdminRepository {
     }
   }
 
+  Future<List<UserModel>> getChatContacts() async {
+    try {
+      final response = await apiClient.get('/chat/contacts');
+      final List<dynamic> data = response.data;
+      return data.map((json) => UserModel.fromJson(json)).toList();
+    } catch (e) {
+      throw _handleError(e, 'Error al obtener chats');
+    }
+  }
+
   Future<void> deleteUser(int idUsuario) async {
     try {
       await apiClient.delete('/admin/users/$idUsuario');

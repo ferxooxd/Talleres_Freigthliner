@@ -26,7 +26,7 @@ class _AdminChatTabState extends State<AdminChatTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().fetchUsers();
+      context.read<AdminProvider>().fetchChatContacts();
     });
   }
 
@@ -40,19 +40,21 @@ class _AdminChatTabState extends State<AdminChatTab> {
   @override
   Widget build(BuildContext context) {
     final adminProvider = context.watch<AdminProvider>();
+    final chatProvider = context.watch<ChatProvider>();
 
     if (adminProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     // Filtrar administradores para no mostrarse a sí mismo y aplicar la búsqueda
-    final chatUsers = adminProvider.users.where((u) {
+    final chatUsers = adminProvider.chatContacts.where((u) {
       if (u.userRole == UserRole.admin) return false;
       if (_searchQuery.isEmpty) return true;
       return u.nombreCompleto.toLowerCase().contains(
         _searchQuery.toLowerCase(),
       );
     }).toList();
+    chatUsers.sort((a, b) => _compareChatUsers(a, b, chatProvider));
 
     return Column(
       children: [
@@ -131,6 +133,35 @@ class _AdminChatTabState extends State<AdminChatTab> {
         ),
       ],
     );
+  }
+
+  int _compareChatUsers(UserModel a, UserModel b, ChatProvider chatProvider) {
+    final aLastMessageAt = _effectiveLastMessageAt(a, chatProvider);
+    final bLastMessageAt = _effectiveLastMessageAt(b, chatProvider);
+
+    if (aLastMessageAt != null && bLastMessageAt != null) {
+      final byRecentActivity = bLastMessageAt.compareTo(aLastMessageAt);
+      if (byRecentActivity != 0) return byRecentActivity;
+    } else if (aLastMessageAt != null) {
+      return -1;
+    } else if (bLastMessageAt != null) {
+      return 1;
+    }
+
+    return a.nombreCompleto.toLowerCase().compareTo(
+      b.nombreCompleto.toLowerCase(),
+    );
+  }
+
+  DateTime? _effectiveLastMessageAt(UserModel user, ChatProvider chatProvider) {
+    final liveLastMessageAt = chatProvider.lastMessageAtFor(user.idUsuario);
+    final persistedLastMessageAt = user.lastMessageAt;
+
+    if (liveLastMessageAt == null) return persistedLastMessageAt;
+    if (persistedLastMessageAt == null) return liveLastMessageAt;
+    return liveLastMessageAt.isAfter(persistedLastMessageAt)
+        ? liveLastMessageAt
+        : persistedLastMessageAt;
   }
 }
 

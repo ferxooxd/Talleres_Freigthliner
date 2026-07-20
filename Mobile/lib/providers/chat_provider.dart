@@ -32,8 +32,11 @@ class ChatProvider extends ChangeNotifier {
 
   // Contadores de no leídos por contacto
   final Map<int, int> _unreadCounts = {};
+  final Map<int, DateTime> _lastMessageAtByContact = {};
   int get totalUnread => _unreadCounts.values.fold(0, (a, b) => a + b);
   int unreadFor(int contactId) => _unreadCounts[contactId] ?? 0;
+  DateTime? lastMessageAtFor(int contactId) =>
+      _lastMessageAtByContact[contactId];
 
   // Estado de carga del historial
   bool _isLoadingHistory = false;
@@ -146,6 +149,7 @@ class ChatProvider extends ChangeNotifier {
     }
 
     final message = MessageModel.fromJson(decoded);
+    _rememberLatestMessageActivity(message);
 
     if (_activeContactId == message.senderId ||
         _activeContactId == message.receiverId ||
@@ -257,6 +261,23 @@ class ChatProvider extends ChangeNotifier {
     if (rawValue == null) return null;
     if (rawValue is String) return rawValue.isEmpty ? null : rawValue;
     return rawValue.toString();
+  }
+
+  DateTime? _parseMessageTimestamp(String? rawValue) {
+    if (rawValue == null || rawValue.isEmpty) return null;
+    return DateTime.tryParse(rawValue);
+  }
+
+  void _rememberLatestMessageActivity(MessageModel message) {
+    final timestamp = _parseMessageTimestamp(message.timestamp);
+    if (timestamp == null) return;
+
+    for (final contactId in {message.senderId, message.receiverId}) {
+      final current = _lastMessageAtByContact[contactId];
+      if (current == null || timestamp.isAfter(current)) {
+        _lastMessageAtByContact[contactId] = timestamp;
+      }
+    }
   }
 
   @visibleForTesting
@@ -373,6 +394,9 @@ class ChatProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         _messages = data.map((e) => MessageModel.fromJson(e)).toList();
+        for (final message in _messages) {
+          _rememberLatestMessageActivity(message);
+        }
         _hasMoreHistory = data.length >= _pageSize;
       }
     } catch (e) {
@@ -397,6 +421,9 @@ class ChatProvider extends ChangeNotifier {
         final List<dynamic> data = response.data;
         final older = data.map((e) => MessageModel.fromJson(e)).toList();
         _messages = [..._messages, ...older];
+        for (final message in older) {
+          _rememberLatestMessageActivity(message);
+        }
         _hasMoreHistory = data.length >= _pageSize;
       }
     } catch (e) {
@@ -425,6 +452,7 @@ class ChatProvider extends ChangeNotifier {
         apiStatus: MessageStatus.sent.apiValue,
       );
       _messages = [tempMsg, ..._messages];
+      _rememberLatestMessageActivity(tempMsg);
       notifyListeners();
     }
 
@@ -446,6 +474,7 @@ class ChatProvider extends ChangeNotifier {
     _isConnected = false;
     _messages.clear();
     _unreadCounts.clear();
+    _lastMessageAtByContact.clear();
     _activeContactId = null;
     notifyListeners();
   }

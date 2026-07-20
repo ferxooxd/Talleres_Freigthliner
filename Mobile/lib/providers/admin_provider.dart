@@ -15,6 +15,7 @@ class AdminProvider with ChangeNotifier {
   List<BookingModel> _allBookings = [];
   List<TechnicalReportModel> _pendingReports = [];
   List<UserModel> _users = [];
+  List<UserModel> _chatContacts = [];
   List<ServiceOrderModel> _serviceOrders = [];
   Map<String, dynamic>? _vehicleHistory;
   List<dynamic> _allVehicles = [];
@@ -25,6 +26,7 @@ class AdminProvider with ChangeNotifier {
   List<BookingModel> get allBookings => _allBookings;
   List<TechnicalReportModel> get pendingReports => _pendingReports;
   List<UserModel> get users => _users;
+  List<UserModel> get chatContacts => _chatContacts;
   List<ServiceOrderModel> get serviceOrders => _serviceOrders;
   Map<String, dynamic>? get vehicleHistory => _vehicleHistory;
   List<dynamic> get allVehicles => _allVehicles;
@@ -146,6 +148,18 @@ class AdminProvider with ChangeNotifier {
     _setError(null);
     try {
       _users = await _repository.getAllUsers();
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchChatContacts() async {
+    _setLoading(true);
+    _setError(null);
+    try {
+      _chatContacts = await _repository.getChatContacts();
     } catch (e) {
       _setError(e.toString());
     } finally {
