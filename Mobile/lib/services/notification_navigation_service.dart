@@ -48,10 +48,13 @@ class NotificationNavigationService {
       case 'order_ready':
         return _orderDestination(data, basePath: '/client/orders');
       case 'booking_created':
+      case 'booking_rescheduled':
         return _bookingDestination(data, basePath: '/admin/bookings');
       case 'booking_confirmed':
       case 'booking_rejected':
         return _bookingDestination(data, basePath: '/client/bookings');
+      case 'technical_report_submitted':
+        return _reportDestination(data, basePath: '/admin/reports');
       default:
         return null;
     }
@@ -103,6 +106,26 @@ class NotificationNavigationService {
     return NotificationDestination(
       location: '$basePath/$bookingId',
       extra: {'bookingId': bookingId, 'type': _stringValue(data['type'])},
+    );
+  }
+
+  NotificationDestination? _reportDestination(
+    Map<String, dynamic> data, {
+    required String basePath,
+  }) {
+    final reportId = _typedId(data['report_id']);
+    if (reportId == null) {
+      return null;
+    }
+
+    final orderId = _typedId(data['order_id']);
+    return NotificationDestination(
+      location: '$basePath/$reportId',
+      extra: {
+        'reportId': reportId,
+        'type': _stringValue(data['type']),
+        if (orderId != null) 'orderId': orderId,
+      },
     );
   }
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -18,13 +18,19 @@ router = APIRouter()
 @router.post("/", response_model=TechnicalReportResponse, status_code=status.HTTP_201_CREATED)
 def create_technical_report(
     report: TechnicalReportRegister, 
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
     Crea un nuevo Informe Técnico asociado a una orden y al usuario autenticado (mecánico).
     """
-    return TechnicalReportService.create_report(db=db, report_data=report, id_usuario=current_user.id_usuario)
+    return TechnicalReportService.create_report(
+        db=db,
+        report_data=report,
+        id_usuario=current_user.id_usuario,
+        background_tasks=background_tasks,
+    )
 
 @router.get("/", response_model=List[TechnicalReportResponse])
 def get_all_technical_reports(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

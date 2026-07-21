@@ -48,13 +48,7 @@ class BookingService:
 
     @staticmethod
     def _notify_admins_about_new_booking(db: Session, booking: Booking, background_tasks=None):
-        admin_user_ids = [
-            row[0]
-            for row in db.query(User.id_usuario)
-            .filter(User.rol == UserRole.admin)
-            .order_by(User.id_usuario)
-            .all()
-        ]
+        admin_user_ids = BookingService._admin_user_ids(db)
         if not admin_user_ids:
             return
 
@@ -78,6 +72,43 @@ class BookingService:
             },
             background_tasks=background_tasks,
         )
+
+    @staticmethod
+    def _notify_admins_about_rescheduled_booking(db: Session, booking: Booking, background_tasks=None):
+        admin_user_ids = BookingService._admin_user_ids(db)
+        if not admin_user_ids:
+            return
+
+        booking_date = booking.fecha_cita.isoformat()
+        booking_time = booking.hora_cita.strftime("%H:%M")
+        client_name = booking.cliente_nombre
+        vehicle_plate = booking.placa_vehiculo
+
+        NotificationService.notify(
+            user_ids=admin_user_ids,
+            type=NotificationType.booking_rescheduled,
+            title="Cita reprogramada",
+            body=(
+                f"{client_name} reprogramo una cita para {booking_date} "
+                f"a las {booking_time}. Vehiculo: {vehicle_plate}"
+            ),
+            data={
+                "type": NotificationType.booking_rescheduled.value,
+                "booking_id": str(booking.id_agendamiento),
+                "booking_date": booking_date,
+            },
+            background_tasks=background_tasks,
+        )
+
+    @staticmethod
+    def _admin_user_ids(db: Session) -> list[int]:
+        return [
+            row[0]
+            for row in db.query(User.id_usuario)
+            .filter(User.rol == UserRole.admin)
+            .order_by(User.id_usuario)
+            .all()
+        ]
 
     @staticmethod
     def get_all_bookings(db: Session, skip: int = 0, limit: int = 100):
@@ -130,6 +161,7 @@ class BookingService:
         id_agendamiento: int,
         booking_data: BookingUpdate,
         current_user=None,
+        background_tasks=None,
     ):
         """Actualiza la fecha/hora de una cita validando la regla de las 3 horas"""
         db_booking = db.query(Booking).filter(Booking.id_agendamiento == id_agendamiento).first()
@@ -159,6 +191,11 @@ class BookingService:
             db_booking.fecha_cita != booking_data.fecha_cita
             or db_booking.hora_cita != booking_data.hora_cita
         )
+        rescheduled_by_client = (
+            current_user is not None
+            and current_user.rol == UserRole.client
+            and schedule_changed
+        )
         if schedule_changed and db_booking.estado_confirmacion == ConfirmationState.CONFIRMADO:
             db_booking.estado_confirmacion = ConfirmationState.PENDIENTE
             db_booking.motivo_rechazo = None
@@ -168,6 +205,12 @@ class BookingService:
         db_booking.observaciones = booking_data.observaciones
         db.commit()
         db.refresh(db_booking)
+        if rescheduled_by_client:
+            BookingService._notify_admins_about_rescheduled_booking(
+                db,
+                db_booking,
+                background_tasks=background_tasks,
+            )
         return db_booking
 
     @staticmethod

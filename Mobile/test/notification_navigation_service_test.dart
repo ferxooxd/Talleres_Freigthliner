@@ -80,6 +80,23 @@ void main() {
     });
   });
 
+  test('booking_rescheduled notification navigates to admin bookings', () {
+    final navigator = FakeNotificationNavigator();
+    final service = NotificationNavigationService(navigator);
+
+    final handled = service.handleData({
+      'type': 'booking_rescheduled',
+      'booking_id': '18',
+    });
+
+    expect(handled, isTrue);
+    expect(navigator.destinations.single.location, '/admin/bookings/18');
+    expect(navigator.destinations.single.extra, {
+      'bookingId': 18,
+      'type': 'booking_rescheduled',
+    });
+  });
+
   test('booking_confirmed notification navigates to client bookings', () {
     final navigator = FakeNotificationNavigator();
     final service = NotificationNavigationService(navigator);
@@ -113,6 +130,28 @@ void main() {
       'type': 'booking_rejected',
     });
   });
+
+  test(
+    'technical_report_submitted notification navigates to admin reports',
+    () {
+      final navigator = FakeNotificationNavigator();
+      final service = NotificationNavigationService(navigator);
+
+      final handled = service.handleData({
+        'type': 'technical_report_submitted',
+        'report_id': '31',
+        'order_id': '42',
+      });
+
+      expect(handled, isTrue);
+      expect(navigator.destinations.single.location, '/admin/reports/31');
+      expect(navigator.destinations.single.extra, {
+        'reportId': 31,
+        'type': 'technical_report_submitted',
+        'orderId': 42,
+      });
+    },
+  );
 
   test('unknown notification type uses controlled fallback', () {
     final navigator = FakeNotificationNavigator();

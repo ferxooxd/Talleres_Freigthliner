@@ -60,6 +60,7 @@ def list_bookings_by_user(id_usuario: int, db: Session = Depends(get_db)):
 def update_booking(
     id_agendamiento: int,
     booking: BookingUpdate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -71,6 +72,7 @@ def update_booking(
         id_agendamiento=id_agendamiento,
         booking_data=booking,
         current_user=current_user,
+        background_tasks=background_tasks,
     )
 
 @router.delete("/{id_agendamiento}")
