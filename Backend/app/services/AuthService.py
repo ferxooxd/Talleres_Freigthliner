@@ -147,6 +147,11 @@ def register_client(db: Session, data: ClientRegister):
 
     token = str(uuid.uuid4())
 
+    # Magia para el primer usuario: Si no hay nadie en la BD, el primero es Super Admin y ya está activo
+    is_first_user = db.query(User).count() == 0
+    assigned_role = UserRole.admin if is_first_user else UserRole.client
+    assigned_active = True if is_first_user else False
+
     user = User(
         nombre=data.nombre,
         apellido=data.apellido,
@@ -154,8 +159,8 @@ def register_client(db: Session, data: ClientRegister):
         cedula=data.cedula,
         correo=data.correo,
         password_hash=hash_password(data.password),
-        rol=UserRole.client,
-        is_active=False,
+        rol=assigned_role,
+        is_active=assigned_active,
         verification_token=token,
     )
 

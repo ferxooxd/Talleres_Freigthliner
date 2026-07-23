@@ -51,7 +51,7 @@ def send_verification_email(correo_destinatario: str, nombre: str, token: str):
     msg.attach(MIMEText(html_content, 'html'))
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=3) as server:
             server.ehlo()
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
