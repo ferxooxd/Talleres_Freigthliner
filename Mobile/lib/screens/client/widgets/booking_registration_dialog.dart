@@ -18,6 +18,7 @@ class BookingRegistrationDialog extends StatefulWidget {
 
 class _BookingRegistrationDialogState extends State<BookingRegistrationDialog> {
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   
   VehicleModel? _selectedVehicle;
   DateTime? _selectedDate;
@@ -97,13 +98,13 @@ class _BookingRegistrationDialogState extends State<BookingRegistrationDialog> {
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedVehicle == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      _scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(content: Text('Por favor selecciona un vehículo'), backgroundColor: AppTheme.red),
       );
       return;
     }
     if (_selectedDate == null || _selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      _scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(content: Text('Por favor selecciona fecha y hora'), backgroundColor: AppTheme.red),
       );
       return;
@@ -120,7 +121,7 @@ class _BookingRegistrationDialogState extends State<BookingRegistrationDialog> {
 
     // Validar que la cita sea con al menos 1 hora de anticipación si es para hoy
     if (selectedDateTime.isBefore(now.add(const Duration(hours: 1)))) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      _scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('La cita debe agendarse con al menos 1 hora de anticipación.'),
           backgroundColor: AppTheme.red,
@@ -235,13 +236,18 @@ class _BookingRegistrationDialogState extends State<BookingRegistrationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppTheme.cardColor(context),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppTheme.borderColor(context)),
-      ),
-      child: Padding(
+    return ScaffoldMessenger(
+      key: _scaffoldMessengerKey,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Dialog(
+            backgroundColor: AppTheme.cardColor(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: AppTheme.borderColor(context)),
+            ),
+            child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
@@ -456,6 +462,9 @@ class _BookingRegistrationDialogState extends State<BookingRegistrationDialog> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
           ),
         ),
       ),

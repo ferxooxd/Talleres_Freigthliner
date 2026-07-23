@@ -1,4 +1,4 @@
-﻿from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session
 from app.core.security import hash_password
 from app.repositories.UserRepository import (
     get_user_by_email,
@@ -15,9 +15,6 @@ def register_mechanic(db: Session, data: MechanicRegister):
     """Registra un nuevo usuario con rol mecanico o secretario.
     Los empleados creados por el admin estan activos por defecto (sin verificar correo).
     """
-    if data.rol == UserRole.mechanic:
-        if not data.especialidad or not data.especialidad.strip():
-            raise ValueError("La especialidad es obligatoria para registrar un mecanico")
 
     existing_user = get_user_by_unique_fields(
         db, data.correo, data.telefono, getattr(data, "cedula", None)

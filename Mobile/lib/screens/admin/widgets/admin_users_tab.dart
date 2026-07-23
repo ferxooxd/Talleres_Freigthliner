@@ -110,18 +110,18 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                           backgroundColor: isAdmin
                               ? Colors.red
                               : isMechanic
-                              ? Colors.orange
-                              : isSecretary
-                              ? Colors.purple
-                              : AppTheme.primaryColor,
+                                  ? Colors.orange
+                                  : isSecretary
+                                      ? Colors.purple
+                                      : AppTheme.primaryColor,
                           child: Icon(
                             isAdmin
                                 ? Icons.admin_panel_settings
                                 : isMechanic
-                                ? Icons.build
-                                : isSecretary
-                                ? Icons.badge
-                                : Icons.person,
+                                    ? Icons.build
+                                    : isSecretary
+                                        ? Icons.badge
+                                        : Icons.person,
                             color: Colors.white,
                           ),
                         ),
@@ -176,7 +176,10 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     );
   }
 
+  // ─── Diálogo Editar Usuario ────────────────────────────────────────────────
+
   void _showEditUserDialog(BuildContext context, UserModel user) {
+    final formKey = GlobalKey<FormState>();
     final nombreCtrl = TextEditingController(
       text: user.nombreCompleto.split(' ').first,
     );
@@ -188,94 +191,114 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.cardColor(context),
-        title: Text(
-          'Editar Usuario',
-          style: TextStyle(color: AppTheme.textColor(context)),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildTextField(context, nombreCtrl, 'Nombre'),
-              const SizedBox(height: 12),
-              _buildTextField(context, apellidoCtrl, 'Apellido'),
-              const SizedBox(height: 12),
-              _buildTextField(
-                context,
-                telefonoCtrl,
-                'Teléfono',
-                isNumeric: true,
-                maxLength: 10,
-              ),
-              const SizedBox(height: 12),
-              _buildTextField(context, cedulaCtrl, 'Cédula', isNumeric: true),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(color: AppTheme.textMutedColor(context)),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
-            ),
-            onPressed: () async {
-              final adminProvider = context.read<AdminProvider>();
-              final navigator = Navigator.of(dialogContext);
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-              if (telefonoCtrl.text.length != 10) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'El teléfono debe tener exactamente 10 dígitos',
+      builder: (dialogContext) => ScaffoldMessenger(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Builder(
+            builder: (innerContext) => Center(
+              child: AlertDialog(
+                backgroundColor: AppTheme.cardColor(context),
+                title: Text(
+                  'Editar Usuario',
+                  style: TextStyle(color: AppTheme.textColor(context)),
+                ),
+                content: SingleChildScrollView(
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildFormField(context, nombreCtrl, 'Nombre',
+                            required: true),
+                        const SizedBox(height: 12),
+                        _buildFormField(context, apellidoCtrl, 'Apellido',
+                            required: true),
+                        const SizedBox(height: 12),
+                        _buildFormField(
+                          context,
+                          telefonoCtrl,
+                          'Teléfono',
+                          isNumeric: true,
+                          maxLength: 10,
+                          required: true,
+                          extraValidator: (val) {
+                            if (val != null && val.length != 10) {
+                              return 'El teléfono debe tener exactamente 10 dígitos';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildFormField(context, cedulaCtrl, 'Cédula',
+                            isNumeric: true, required: true),
+                      ],
                     ),
-                    backgroundColor: AppTheme.errorColor,
-                    behavior: SnackBarBehavior.floating,
                   ),
-                );
-                return;
-              }
-              try {
-                await adminProvider.updateUser(user.idUsuario, {
-                  'nombre': nombreCtrl.text,
-                  'apellido': apellidoCtrl.text,
-                  'telefono': telefonoCtrl.text,
-                  'cedula': cedulaCtrl.text,
-                });
-                navigator.pop();
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Usuario actualizado'),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(
+                      'Cancelar',
+                      style:
+                          TextStyle(color: AppTheme.textMutedColor(context)),
+                    ),
                   ),
-                );
-              } catch (e) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text('Error: $e'),
-                    backgroundColor: AppTheme.errorColor,
-                    behavior: SnackBarBehavior.floating,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                    ),
+                    onPressed: () async {
+                      if (!formKey.currentState!.validate()) return;
+
+                      final adminProvider = context.read<AdminProvider>();
+                      final navigator = Navigator.of(dialogContext);
+                      final scaffoldMessenger =
+                          ScaffoldMessenger.of(innerContext);
+
+                      try {
+                        await adminProvider.updateUser(user.idUsuario, {
+                          'nombre': nombreCtrl.text,
+                          'apellido': apellidoCtrl.text,
+                          'telefono': telefonoCtrl.text,
+                          'cedula': cedulaCtrl.text,
+                        });
+                        navigator.pop();
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Usuario actualizado'),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      } catch (e) {
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(
+                            content: Text('Error: $e'),
+                            backgroundColor: AppTheme.errorColor,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Guardar',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
-                );
-              }
-            },
-            child: const Text('Guardar', style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
 
+  // ─── Diálogo Añadir Personal ───────────────────────────────────────────────
+
   void _showCreateStaffDialog(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
     final nombreCtrl = TextEditingController();
     final apellidoCtrl = TextEditingController();
     final telefonoCtrl = TextEditingController();
@@ -287,195 +310,294 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setStateSB) {
-          return AlertDialog(
-            backgroundColor: AppTheme.cardColor(context),
-            title: Text(
-              'Añadir Personal',
-              style: TextStyle(color: AppTheme.textColor(context)),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildTextField(context, nombreCtrl, 'Nombre'),
-                  const SizedBox(height: 12),
-                  _buildTextField(context, apellidoCtrl, 'Apellido'),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    context,
-                    telefonoCtrl,
-                    'Teléfono',
-                    isNumeric: true,
-                    maxLength: 10,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    context,
-                    cedulaCtrl,
-                    'Cédula',
-                    isNumeric: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField(context, correoCtrl, 'Correo', isEmail: true),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    context,
-                    passCtrl,
-                    'Contraseña',
-                    obscure: true,
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedRole,
-                    dropdownColor: AppTheme.cardColor(context),
+      builder: (dialogContext) => ScaffoldMessenger(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: StatefulBuilder(
+            builder: (innerContext, setStateSB) {
+              return Center(
+                child: AlertDialog(
+                  backgroundColor: AppTheme.cardColor(context),
+                  title: Text(
+                    'Añadir Personal',
                     style: TextStyle(color: AppTheme.textColor(context)),
-                    decoration: InputDecoration(
-                      labelText: 'Rol',
-                      labelStyle: TextStyle(
-                        color: AppTheme.textMutedColor(context),
-                      ),
-                      filled: true,
-                      fillColor: AppTheme.inputColor(context),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
+                  ),
+                  content: SingleChildScrollView(
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Nombre
+                          _buildFormField(context, nombreCtrl, 'Nombre',
+                              required: true),
+                          const SizedBox(height: 12),
+                          // Apellido
+                          _buildFormField(context, apellidoCtrl, 'Apellido',
+                              required: true),
+                          const SizedBox(height: 12),
+                          // Teléfono
+                          _buildFormField(
+                            context,
+                            telefonoCtrl,
+                            'Teléfono',
+                            isNumeric: true,
+                            maxLength: 10,
+                            required: true,
+                            extraValidator: (val) {
+                              if (val != null && val.isNotEmpty && val.length != 10) {
+                                return 'El teléfono debe tener exactamente 10 dígitos';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          // Cédula (obligatorio)
+                          _buildFormField(
+                            context,
+                            cedulaCtrl,
+                            'Cédula',
+                            isNumeric: true,
+                            required: true,
+                            extraValidator: (val) {
+                              if (val != null && val.isNotEmpty && val.length < 6) {
+                                return 'La cédula debe tener al menos 6 dígitos';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          // Correo
+                          _buildFormField(
+                            context,
+                            correoCtrl,
+                            'Correo electrónico',
+                            isEmail: true,
+                            required: true,
+                            extraValidator: (val) {
+                              if (val != null && val.isNotEmpty) {
+                                if (!val.contains('@')) {
+                                  return 'El correo debe contener @';
+                                }
+                                if (!RegExp(r'^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$')
+                                    .hasMatch(val)) {
+                                  return 'Ingresa un correo válido (ej: nombre@gmail.com)';
+                                }
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          // Contraseña (obligatorio)
+                          _buildFormField(
+                            context,
+                            passCtrl,
+                            'Contraseña',
+                            obscure: true,
+                            required: true,
+                            extraValidator: (val) {
+                              if (val != null && val.isNotEmpty && val.length < 6) {
+                                return 'La contraseña debe tener al menos 6 caracteres';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          // Rol
+                          DropdownButtonFormField<String>(
+                            initialValue: selectedRole,
+                            dropdownColor: AppTheme.cardColor(context),
+                            style:
+                                TextStyle(color: AppTheme.textColor(context)),
+                            decoration: InputDecoration(
+                              labelText: 'Rol',
+                              labelStyle: TextStyle(
+                                color: AppTheme.textMutedColor(context),
+                              ),
+                              filled: true,
+                              fillColor: AppTheme.inputColor(context),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Tecnico',
+                                child: Text('Técnico'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Secretario',
+                                child: Text('Secretario'),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              setStateSB(() {
+                                selectedRole = val!;
+                              });
+                            },
+                          ),
+                          // Especialidad (solo para Técnico, opcional)
+                          if (selectedRole == 'Tecnico') ...[
+                            const SizedBox(height: 12),
+                            _buildFormField(
+                              context,
+                              espCtrl,
+                              'Especialidad (Opcional)',
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Tecnico',
-                        child: Text('Técnico'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Secretario',
-                        child: Text('Secretario'),
-                      ),
-                    ],
-                    onChanged: (val) {
-                      setStateSB(() {
-                        selectedRole = val!;
-                      });
-                    },
                   ),
-                  if (selectedRole == 'Tecnico') ...[
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      context,
-                      espCtrl,
-                      'Especialidad (Opcional)',
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          color: AppTheme.textMutedColor(context),
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                      onPressed: () async {
+                        // Dispara validaciones inline en todos los campos
+                        if (!formKey.currentState!.validate()) return;
+
+                        final adminProvider = context.read<AdminProvider>();
+                        final navigator = Navigator.of(dialogContext);
+                        final scaffoldMessenger =
+                            ScaffoldMessenger.of(innerContext);
+
+                        try {
+                          await adminProvider.createMechanic({
+                            'nombre': nombreCtrl.text.trim(),
+                            'apellido': apellidoCtrl.text.trim(),
+                            'telefono': telefonoCtrl.text.trim(),
+                            'cedula': cedulaCtrl.text.trim(),
+                            'correo': correoCtrl.text.trim(),
+                            'password': passCtrl.text,
+                            'rol': selectedRole,
+                            'especialidad':
+                                selectedRole == 'Tecnico' &&
+                                        espCtrl.text.isNotEmpty
+                                    ? espCtrl.text.trim()
+                                    : null,
+                          });
+                          navigator.pop();
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('$selectedRole creado exitosamente'),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        } catch (e) {
+                          // Mensaje de error amigable para errores del servidor
+                          String mensaje = e.toString();
+                          if (mensaje.contains('correo') ||
+                              mensaje.contains('email')) {
+                            mensaje =
+                                'El correo ingresado no es válido o ya está registrado.';
+                          } else if (mensaje.contains('cedula')) {
+                            mensaje = 'La cédula ingresada ya está registrada.';
+                          } else if (mensaje.contains('telefono')) {
+                            mensaje =
+                                'El teléfono ingresado ya está registrado.';
+                          }
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(
+                              content: Text(mensaje),
+                              backgroundColor: AppTheme.errorColor,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'Crear',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: Text(
-                  'Cancelar',
-                  style: TextStyle(color: AppTheme.textMutedColor(context)),
                 ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
-                ),
-                onPressed: () async {
-                  final adminProvider = context.read<AdminProvider>();
-                  final navigator = Navigator.of(dialogContext);
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-                  if (telefonoCtrl.text.length != 10) {
-                    scaffoldMessenger.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'El teléfono debe tener exactamente 10 dígitos',
-                        ),
-                        backgroundColor: AppTheme.errorColor,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-                  try {
-                    await adminProvider.createMechanic({
-                      'nombre': nombreCtrl.text,
-                      'apellido': apellidoCtrl.text,
-                      'telefono': telefonoCtrl.text,
-                      'cedula': cedulaCtrl.text,
-                      'correo': correoCtrl.text,
-                      'password': passCtrl.text,
-                      'rol': selectedRole,
-                      'especialidad':
-                          selectedRole == 'Tecnico' && espCtrl.text.isNotEmpty
-                          ? espCtrl.text
-                          : null,
-                    });
-                    navigator.pop();
-                    scaffoldMessenger.showSnackBar(
-                      SnackBar(
-                        content: Text('$selectedRole creado exitosamente'),
-                        backgroundColor: Colors.green,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  } catch (e) {
-                    scaffoldMessenger.showSnackBar(
-                      SnackBar(
-                        content: Text('Error: $e'),
-                        backgroundColor: AppTheme.errorColor,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                child: const Text(
-                  'Crear',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildTextField(
+  // ─── Widget helper: TextFormField con validación inline ───────────────────
+
+  Widget _buildFormField(
     BuildContext context,
     TextEditingController controller,
     String label, {
     bool obscure = false,
     bool isEmail = false,
     bool isNumeric = false,
+    bool required = false,
     int? maxLength,
+    String? Function(String?)? extraValidator,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscure,
       maxLength: maxLength,
       keyboardType: isNumeric
           ? TextInputType.number
           : (isEmail ? TextInputType.emailAddress : TextInputType.text),
-      inputFormatters: isNumeric
-          ? [FilteringTextInputFormatter.digitsOnly]
-          : null,
+      inputFormatters:
+          isNumeric ? [FilteringTextInputFormatter.digitsOnly] : null,
       style: TextStyle(color: AppTheme.textColor(context)),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         labelText: label,
         counterText: '',
         labelStyle: TextStyle(color: AppTheme.textMutedColor(context)),
         filled: true,
         fillColor: AppTheme.inputColor(context),
-        border: OutlineInputBorder(
+        // Borde normal
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: AppTheme.borderColor(context)),
         ),
+        // Borde al enfocar
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+        ),
+        // Borde rojo cuando hay error
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.errorColor, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.errorColor, width: 2),
+        ),
+        errorStyle: const TextStyle(color: AppTheme.errorColor, fontSize: 12),
       ),
+      validator: (val) {
+        if (required && (val == null || val.trim().isEmpty)) {
+          return 'Este campo es obligatorio';
+        }
+        if (extraValidator != null) {
+          return extraValidator(val);
+        }
+        return null;
+      },
     );
   }
+
+  // ─── Confirmar eliminación ────────────────────────────────────────────────
 
   void _confirmDelete(BuildContext context, int id, String nombre) {
     showDialog(
